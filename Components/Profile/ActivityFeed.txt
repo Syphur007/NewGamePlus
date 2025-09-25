@@ -1,0 +1,111 @@
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { StatusUpdate, Challenge, User, Game, Match } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, MessageCircle, Zap } from 'lucide-react';
+import FeedItem from "../feed/FeedItem";
+import PostUpdateForm from "../feed/PostUpdateForm";
+
+export default function UserActivityFeed({ profileUser, currentUser, isCurrentUserProfile, onOpenChallengeModal }) {
+  const [feedItems, setFeedItems] = useState([]);
+  const [users, setUsers] = useState({});
+  const [games, setGames] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [canViewPrivate, setCanViewPrivate] = useState(false);
+
+  const loadData = useCallback(async () => {
+    if (!profileUser || !currentUser) return;
+    setIsLoading(true);
+
+    try {
+        let isMatch = false;
+        if (!isCurrentUserProfile) {
+            const matches = await Match.filter({
+                $or: [
+                    { user_id: currentUser.id, matched_user_id: profileUser.id },
+                    { user_id: profileUser.id, matched_user_id: currentUser.id }
+                ]
+            });
+            isMatch = matches.length > 0;
+        }
+        setCanViewPrivate(isMatch || isCurrentUserProfile);
+
+        // Define filters based on privacy settings
+        const statusFilter = (isMatch || isCurrentUserProfile)
+            ? { user_id: profileUser.id } 
+            : { user_id: profileUser.id, is_public: true };
+        
+        const challengeFilter = { $or: [{ challenger_id: profileUser.id }, { challenged_id: profileUser.id }] };
+
+        const [userStatusUpdates, userChallenges, allUsers, allGames] = await Promise.all([
+            StatusUpdate.filter(statusFilter, "-created_date", 20),
+            Challenge.filter(challengeFilter, "-created_date", 20),
+            User.list(),
+            Game.list()
+        ]);
+        
+        const combinedFeed = [
+            ...userStatusUpdates.map(item => ({ ...item, type: 'status' })),
+            ...userChallenges.map(item => ({ ...item, type: 'challenge' }))
+        ].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+
+        setFeedItems(combinedFeed);
+        setUsers(allUsers.reduce((acc, u) => ({...acc, [u.id]: u}), {}));
+        setGames(allGames.reduce((acc, g) => ({...acc, [g.id]: g}), {}));
+
+    } catch (error) {
+        console.error("Error loading user activity:", error);
+    } finally {
+        setIsLoading(false);
+    }
+  }, [profileUser, currentUser, isCurrentUserProfile]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+  
+  return (
+    <Card className="neon-border-purple card-neon-purple backdrop-blur-xl h-fit">
+      <CardHeader className="pb-3">
+        <CardTitle className="neon-text-green text-lg flex items-center gap-2">
+          <Activity className="w-5 h-5 text-[#00FF41]" />
+          {isCurrentUserProfile ? "My Activity" : `${profileUser?.display_name}'s Activity`}
+        </CardTitle>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        {isCurrentUserProfile && (
+            <PostUpdateForm 
+                currentUser={currentUser} 
+                onStatusPosted={loadData}
+                onOpenChallengeModal={onOpenChallengeModal}
+            />
+        )}
+
+        <div className="space-y-3 max-h-[40rem] overflow-y-auto pr-2">
+          {isLoading ? (
+             <div className="text-center py-6 text-gray-400">Loading activity...</div>
+          ) : feedItems.length > 0 ? (
+            feedItems.map((item) => (
+              <FeedItem
+                key={`${item.type}-${item.id}`}
+                item={item}
+                currentUser={currentUser}
+                users={users}
+                games={games}
+                onUpdate={loadData}
+              />
+            ))
+          ) : (
+            <div className="text-center py-6">
+              <MessageCircle className="w-8 h-8 mx-auto mb-2 text-gray-500" />
+              <p className="text-gray-400 text-sm">
+                No recent activity to show.
+              </p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

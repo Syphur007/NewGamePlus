@@ -1,0 +1,39 @@
+import { User, UserGame, Game, Challenge } from "@/entities/all";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Zap, Loader2, Users, Gamepad2, ShieldAlert } from 'lucide-react';
+import { toast } from "sonner";
+import OpponentWheel from "../components/callouts/OpponentWheel";
+import GameWheel from "../components/callouts/GameWheel";
+
+export default function CallOutsPage() {
+    const [step, setStep] = useState('initial'); // 'initial', 'opponent_select', 'game_select', 'sent'
+    const [isLoading, setIsLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [compatibleOpponents, setCompatibleOpponents] = useState([]);
+    const [sharedGames, setSharedGames] = useState([]);
+    const [selectedOpponent, setSelectedOpponent] = useState(null);
+    const [allGames, setAllGames] = useState({});
+
+    const loadData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const me = await User.me();
+            setCurrentUser(me);
+
+            const [allUsers, allUserGames, gamesList] = await Promise.all([
+                User.list(),
+                UserGame.list(),
+                Game.list(),
+            ]);
+
+            const gamesMap = gamesList.reduce((acc, g) => ({ ...acc, [g.id]: g }), {});
+            setAllGames(gamesMap);
+
+            const myTopTenGameIds = new Set(
+                allUserGames
+                    .filter(ug => ug.user_id === me.id && ug.is_top_ten)
+                    .map(ug => ug.game_id)
+            );
+
+            if (myTopTenGameIds.size === 0) {

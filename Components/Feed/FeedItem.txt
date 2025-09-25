@@ -1,0 +1,99 @@
+
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Activity, Gamepad2, Trophy, Users, Send, MessageCircle, Clock, Target, Eye, Zap, ShieldCheck, ShieldX, Swords } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { Challenge } from "@/entities/all";
+import { toast } from "sonner";
+import { cn } from '@/lib/utils';
+
+// --- Helper Components ---
+
+const getStatusMeta = (statusType) => {
+    const map = {
+      playing: { icon: Gamepad2, color: 'text-green-400', label: 'Currently Playing' },
+      looking_for_match: { icon: Users, color: 'text-blue-400', label: 'Looking for Match' },
+      achievement: { icon: Trophy, color: 'text-yellow-400', label: 'Achievement Unlocked' },
+      online: { icon: Activity, color: 'text-green-400', label: 'Online' },
+      offline: { icon: Activity, color: 'text-gray-500', label: 'Offline' },
+      general: { icon: MessageCircle, color: 'text-purple-400', label: 'Post' },
+    };
+    return map[statusType] || map.general;
+};
+
+const FeedHeader = ({ user, item, typeLabel }) => (
+    <div className="flex items-center gap-3">
+        <Link to={createPageUrl(`Profile?id=${user?.id}`)}>
+            <Avatar className="w-11 h-11 border-2 border-purple-800/50 hover:border-purple-500/80 transition-all">
+                <AvatarImage src={user?.avatar_url} />
+                <AvatarFallback>{user?.display_name?.[0]}</AvatarFallback>
+            </Avatar>
+        </Link>
+        <div>
+            <Link to={createPageUrl(`Profile?id=${user?.id}`)}>
+                <h4 className="font-semibold text-white hover:text-purple-300 transition-colors">{user?.display_name || "Unknown User"}</h4>
+            </Link>
+            <p className="text-xs text-gray-400">
+                {typeLabel} • {formatDistanceToNow(new Date(item.created_date), { addSuffix: true })}
+            </p>
+        </div>
+    </div>
+);
+
+// --- Main Feed Item Component ---
+
+export default function FeedItem({ item, currentUser, users, games, onUpdate }) {
+    const isStatus = item.type === 'status';
+    const isChallenge = item.type === 'challenge';
+
+    // Handlers for Challenge Actions
+    const handleAcceptChallenge = async (challenge) => {
+        try {
+            await Challenge.update(challenge.id, { status: 'accepted' });
+            toast.success("Challenge accepted! Get ready to battle!");
+            if (onUpdate) onUpdate();
+        } catch (error) {
+            toast.error("Failed to accept challenge.");
+        }
+    };
+
+    const handleDeclineChallenge = async (challenge) => {
+        try {
+            await Challenge.update(challenge.id, { status: 'declined' });
+            toast.info("Challenge declined.");
+            if (onUpdate) onUpdate();
+        } catch (error) {
+            toast.error("Failed to decline challenge.");
+        }
+    };
+
+    // --- RENDER STATUS UPDATE ---
+    if (isStatus) {
+        const user = users[item.user_id];
+        const game = item.game_id ? games[item.game_id] : null;
+        const meta = getStatusMeta(item.status_type);
+        const Icon = meta.icon;
+
+        return (
+            <Card className="bg-slate-900/50 backdrop-blur-xl border border-purple-800/20">
+                <CardContent className="p-5">
+                    <div className="flex gap-4">
+                        <Icon className={cn("w-5 h-5 flex-shrink-0 mt-1", meta.color)} />
+                        <div className="flex-1">
+                            <FeedHeader user={user} item={item} typeLabel={meta.label} />
+                            <p className="text-gray-200 mt-3 whitespace-pre-wrap">{item.content}</p>
+                            {game && (
+                                <div className="mt-3 p-3 bg-slate-800/50 rounded-lg flex items-center gap-3">
+                                    <Gamepad2 className="w-4 h-4 text-purple-400" />
+                                    <span className="text-sm text-gray-300">Related Game: <strong className="text-white">{game.title}</strong></span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </CardContent>
+ 

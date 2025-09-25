@@ -1,0 +1,77 @@
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Save, X, Lock, Globe } from "lucide-react";
+import MediaUploader from "./MediaUploader";
+import { Switch } from "@/components/ui/switch";
+import SocialLinksEditor from "./SocialLinksEditor";
+import { toast } from "sonner";
+
+const GAMING_SETUPS = [
+  { value: "pc", label: "PC Gaming", description: "Windows, Mac, Linux" },
+  { value: "playstation", label: "PlayStation", description: "PS5, PS4, PS3" },
+  { value: "xbox", label: "Xbox", description: "Series X/S, One, 360" },
+  { value: "nintendo_switch", label: "Nintendo Switch", description: "Switch, Switch Lite, OLED" },
+  { value: "steam_deck", label: "Steam Deck", description: "Valve's handheld PC" },
+  { value: "mobile_ios", label: "iPhone/iPad Gaming", description: "iOS mobile games" },
+  { value: "mobile_android", label: "Android Gaming", description: "Android mobile games" },
+  { value: "vr_meta", label: "Meta VR", description: "Quest 2, Quest 3, Quest Pro" },
+  { value: "vr_playstation", label: "PlayStation VR", description: "PSVR, PSVR2" },
+  { value: "vr_htc", label: "PC VR", description: "HTC Vive, Valve Index" },
+  { value: "ar", label: "AR Gaming", description: "Augmented Reality" },
+  { value: "retro_consoles", label: "Retro Gaming", description: "Classic consoles" },
+  { value: "handheld", label: "Handheld Gaming", description: "3DS, Vita, etc." },
+  { value: "mixed_platforms", label: "All Platforms", description: "I game on everything!" }
+];
+
+const PLAYSTYLES = [
+  { value: "casual", label: "Casual" },
+  { value: "competitive", label: "Competitive" },
+  { value: "hardcore", label: "Hardcore" },
+  { value: "mixed", label: "Mixed" }
+];
+
+const LOOKING_FOR = [
+  { value: "casual", label: "Casual Dating" },
+  { value: "serious", label: "Serious Relationship" },
+  { value: "friendship", label: "Gaming Friends" },
+  { value: "gaming_partner", label: "Gaming Partner" }
+];
+
+export default function ProfileEditor({ user, onSave, onCancel }) {
+  const [formData, setFormData] = useState({
+    display_name: user?.display_name || "",
+    age: user?.age || "",
+    location: user?.location || "",
+    bio: user?.bio || "",
+    avatar_url: user?.avatar_url || "",
+    gaming_setup: user?.gaming_setup || "",
+    playstyle: user?.playstyle || "",
+    looking_for: user?.looking_for || "",
+    is_profile_private: user?.is_profile_private ?? false,
+    image_gallery: user?.image_gallery || [],
+    video_gallery: user?.video_gallery || [],
+    background_music_url: user?.background_music_url || "",
+    discord_username: user?.discord_username || "",
+    twitch_username: user?.twitch_username || "",
+    youtube_channel: user?.youtube_channel || "",
+    twitter_handle: user?.twitter_handle || "",
+  });
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAgeChange = (e) => {
+    const value = e.target.value;
+    if (value === "" || /^[0-9]+$/.test(value)) {
+        setFormData((prev) => ({ ...prev, age: value }));
+    }
+  };

@@ -1,0 +1,43 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Download, Database, Shield, AlertTriangle } from 'lucide-react';
+import { User, UserGame, Message, StatusUpdate } from "@/entities/all";
+import { toast } from "sonner";
+
+export default function DataExportTool({ currentUser }) {
+  const [selectedData, setSelectedData] = useState({
+    profile: true,
+    games: true,
+    messages: false,
+    status_updates: false,
+    matches: true
+  });
+  const [isExporting, setIsExporting] = useState(false);
+
+  const dataTypes = [
+    { key: 'profile', label: 'Profile Information', description: 'Name, bio, preferences, contact info' },
+    { key: 'games', label: 'Game Library', description: 'Top Ten list, hours played, skill levels' },
+    { key: 'messages', label: 'Messages', description: 'Your conversations with other users' },
+    { key: 'status_updates', label: 'Status Updates', description: 'Your posts and activity feed' },
+    { key: 'matches', label: 'Match History', description: 'Your matches and compatibility scores' }
+  ];
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    
+    try {
+      const exportData = {};
+      
+      // Export profile data
+      if (selectedData.profile) {
+        const userData = await User.me();
+        exportData.profile = {
+          display_name: userData.display_name,
+          age: userData.age,
+          location: userData.location,
+          bio: userData.bio,
+          gaming_setup: userData.gaming_setup,
+          preferred_genres: userData.preferred_genres,
+ 

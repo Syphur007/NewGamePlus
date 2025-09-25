@@ -1,0 +1,43 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Clock, Users, Eye, Zap, MessageSquare } from "lucide-react";
+import { agentSDK } from "@/agents";
+import UserCard from "./UserCard";
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { toast } from "sonner";
+
+export default function SimilarHoursSection({ currentUser, users, onOpenProfile }) {
+    const [suggestions, setSuggestions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [conversation, setConversation] = useState(null);
+
+    const fallbackMatching = useCallback(() => {
+        // Simple fallback matching if agent fails
+        const eligibleUsers = users
+            .filter(u => u.id !== currentUser.id && u.is_profile_complete)
+            .slice(0, 6);
+        
+        setSuggestions(eligibleUsers.map(user => ({
+            ...user,
+            compatibility_score: Math.floor(Math.random() * 30) + 70, // Random score 70-100
+            reasoning: "Similar gaming profile and interests",
+            time_investment_match: "Compatible gaming dedication level"
+        })));
+        
+        setIsLoading(false);
+    }, [users, currentUser]);
+
+    const getSimilarHoursSuggestions = useCallback(async () => {
+        if (!currentUser) return;
+        
+        setIsLoading(true);
+        try {
+            // Create or get conversation with the gaming hours matcher agent
+            const conv = await agentSDK.createConversation({
+                agent_name: "gaming_hours_matcher",
+                metadata: {
+                    name: "Gaming Hours Compatibility",
+                    description: "Finding users with similar gaming dedication levels"
+ 

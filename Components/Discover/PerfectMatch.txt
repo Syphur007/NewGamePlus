@@ -1,0 +1,43 @@
+import React from 'react';
+import { Trophy, Zap, Heart } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+export default function PerfectMatchIndicator({ score, sharedGamesCount }) {
+  if (score < 75) return null;
+
+  const getMatchDetails = () => {
+    if (score >= 90) {
+      return {
+        icon: Trophy,
+        text: "Perfect Match!",
+        color: "text-[#00FF41] bg-[#00FF41]/20 border-[#00FF41]/50",
+        glow: "shadow-lg shadow-[#00FF41]/30",
+        tooltip: `Elite compatibility (${score}%) with ${sharedGamesCount} shared Top Ten games.`
+      };
+    }
+    if (score >= 80) {
+      return {
+        icon: Zap,
+        text: "Great Match!",
+        color: "text-purple-300 bg-purple-600/20 border-purple-500/50",
+        glow: "shadow-lg shadow-purple-500/20",
+        tooltip: `High compatibility (${score}%) with ${sharedGamesCount} shared Top Ten games.`
+      };
+    }
+    return {
+      icon: Heart,
+      text: "Good Match",
+      color: "text-pink-400 bg-pink-500/10 border-pink-500/40",
+      glow: "",
+      tooltip: `Strong compatibility (${score}%) with shared gaming interests.`
+    };
+  };
+
+  const details = getMatchDetails();
+  const Icon = details.icon;
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+ 

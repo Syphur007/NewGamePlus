@@ -1,0 +1,34 @@
+
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trophy, Users, Users2, Zap, Gamepad2, Info, Shield, Clock } from 'lucide-react';
+
+const steps = [
+    {
+        icon: Gamepad2,
+        title: "1. Build Your 'Top Ten List' (TTL)™",
+        description: "Go to your Profile and add 1-10 games you're most passionate about playing right now. Include your honest hours played and skill level - this revolutionary matching system uses everything to find your perfect gaming partner and/or teammate!",
+    },
+    {
+        icon: Users,
+        title: "2. Discover Compatible Players",
+        description: "Head to the Discover page and hit 'Find Compatible Matches'. Our exclusive TTL™ algorithm matches you with players who share your current gaming obsessions AND have similar play time commitment.",
+    },
+    {
+        icon: Zap,
+        title: "3. Send Match Requests",
+        description: "Found someone interesting? Send them a match request! Our system shows compatibility based on shared games, hours played, and skill levels. If they accept, you'll become official 'Gaming Partners' and can start chatting.",
+    },
+    {
+        icon: Clock,
+        title: "4. Use Call Outs & Play Dates",
+        description: "Challenge your gaming partners to instant duels via the Call Outs page, or schedule future gaming sessions using the Play Dates feature. Your matched hours and skill levels ensure balanced, fun gameplay.",
+    },
+];
+
+export default function HowToPage() {
+    return (
+        <div className="p-6 max-w-4xl mx-auto">
+            <div className="mb-8 text-center">
+                <h1 className="page-title-font text-4xl font-black tracking-wider drop-shadow-lg mb-4">
+ 

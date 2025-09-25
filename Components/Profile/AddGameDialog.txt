@@ -1,0 +1,77 @@
+
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { X, Plus, GamepadIcon, AlertCircle } from "lucide-react";
+import { Game } from "@/entities/all";
+
+const SKILL_LEVELS = [
+  { value: "beginner", label: "Beginner" },
+  { value: "intermediate", label: "Intermediate" },
+  { value: "advanced", label: "Advanced" },
+  { value: "expert", label: "Expert" }
+];
+
+const GAME_GENRES = [
+  "FPS", "MOBA", "Battle Royale", "RPG", "MMORPG", "Action", "Adventure",
+  "Strategy", "Sports", "Racing", "Fighting", "Puzzle", "Simulation",
+  "Sandbox", "Survival", "Horror", "Platformer", "Social Deduction", "Other"
+];
+
+const PLATFORMS = [
+  "PC", "PlayStation", "Xbox", "Nintendo Switch", "Mobile", "VR"
+];
+
+export default function AddGameDialog({ games, onSave, onCancel, onGameAdded }) {
+  const [activeTab, setActiveTab] = useState("existing");
+  const [formData, setFormData] = useState({
+    game_id: "",
+    hours_played: "",
+    skill_level: "intermediate",
+    // `is_currently_playing` is removed as games added via this dialog are now implicitly "Top Ten"
+  });
+
+  const [newGameData, setNewGameData] = useState({
+    title: "",
+    genre: "",
+    platform: [],
+    image_url: "",
+    description: "", // Added new field for game description
+    is_multiplayer: true
+  });
+
+  const [isCreatingGame, setIsCreatingGame] = useState(false);
+  const [duplicateError, setDuplicateError] = useState("");
+
+  // The main handleSubmit logic for adding to user's library is moved to ExistingGameForm
+  // No need for a top-level handleSubmit here.
+
+  const handleCreateGame = async (e) => {
+    e.preventDefault();
+    setIsCreatingGame(true);
+    setDuplicateError(""); // Clear previous errors
+
+    // Check for duplicates (case-insensitive)
+    const existingGame = games.find(g => g.title.toLowerCase() === newGameData.title.trim().toLowerCase());
+    if (existingGame) {
+      setDuplicateError(`A game named "${existingGame.title}" already exists. Please use the "Select Existing Game" tab.`);
+      setIsCreatingGame(false);
+      return;
+    }
+
+    try {
+      const createdGame = await Game.create(newGameData);
+
+      // After creating a new game, automatically select it in the existing tab
+      // so the user can immediately add it to their Top Ten.
+      setFormData(prev => ({ ...prev, game_id: createdGame.id }));
+      setActiveTab("existing");
+
+      if (onGameAdded) {
+        onGameAdded(createdGame); // Notify parent component about the new game
+      }

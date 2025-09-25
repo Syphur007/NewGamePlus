@@ -1,0 +1,63 @@
+  "name": "GamingPartnership",
+  "type": "object",
+  "properties": {
+    "user1_id": {
+      "type": "string",
+      "description": "First user in the partnership"
+    },
+    "user2_id": {
+      "type": "string",
+      "description": "Second user in the partnership"
+    },
+    "partnership_name": {
+      "type": "string",
+      "description": "Custom name for the duo/squad (e.g., 'The Apex Legends', 'Minecraft Masters')"
+    },
+    "partnership_level": {
+      "type": "number",
+      "default": 1,
+      "description": "Partnership level (1-100) based on activity together"
+    },
+    "total_hours_played": {
+      "type": "number",
+      "default": 0,
+      "description": "Total hours played together across all games"
+    },
+    "games_played_together": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of game IDs they've played together"
+    },
+    "current_streak": {
+      "type": "number",
+      "default": 0,
+      "description": "Current consecutive days with gaming activity"
+    },
+    "longest_streak": {
+      "type": "number",
+      "default": 0,
+      "description": "Longest consecutive day streak achieved"
+    },
+    "shared_achievements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Partnership achievements unlocked together"
+    },
+    "compatibility_evolution": {
+      "type": "number",
+      "description": "How compatibility has evolved based on actual gameplay (dynamic score)"
+    },
+    "favorite_shared_game": {
+      "type": "string",
+      "description": "Game they play most together"
+    },
+    "partnership_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "casual",
+ 

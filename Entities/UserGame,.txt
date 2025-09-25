@@ -1,0 +1,40 @@
+  "name": "UserGame",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Reference to user"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "Reference to game"
+    },
+    "hours_played": {
+      "type": "number",
+      "description": "Total hours played in this game"
+    },
+    "skill_level": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced",
+        "expert"
+      ],
+      "default": "intermediate",
+      "description": "Player's skill level in this game"
+    },
+    "is_top_ten": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this game is in user's Top Ten active games for matching (TTMS - Top Ten Matching System™)"
+    },
+    "priority_rank": {
+      "type": "number",
+      "description": "Ranking within Top Ten (1-10, where 1 is highest priority)"
+    }
+  },
+  "required": [
+    "user_id",
+    "game_id",
+ 

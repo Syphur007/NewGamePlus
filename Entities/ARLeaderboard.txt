@@ -1,0 +1,63 @@
+  "name": "ARLeaderboard",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user on the leaderboard"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "AR game ID"
+    },
+    "score": {
+      "type": "number",
+      "description": "Player's high score"
+    },
+    "achievement_level": {
+      "type": "string",
+      "enum": [
+        "bronze",
+        "silver",
+        "gold",
+        "platinum",
+        "diamond"
+      ],
+      "default": "bronze",
+      "description": "Achievement level based on score"
+    },
+    "session_duration": {
+      "type": "number",
+      "description": "Duration of the session in minutes"
+    },
+    "ar_room_code": {
+      "type": "string",
+      "description": "AR room/session identifier"
+    },
+    "challenge_mode": {
+      "type": "string",
+      "enum": [
+        "solo",
+        "duo",
+        "squad"
+      ],
+      "default": "solo",
+      "description": "Challenge mode played"
+    },
+    "date_achieved": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this score was achieved"
+    }
+  },
+  "required": [
+    "user_id",
+    "game_id",
+    "score"
+  ],
+  "rls": {
+    "read": {},
+    "write": {
+      "user_id": "{{user.id}}"
+    }
+  }
+}

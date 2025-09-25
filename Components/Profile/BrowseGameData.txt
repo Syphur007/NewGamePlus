@@ -1,0 +1,111 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { Game, UserGame, GameRating, User } from "@/entities/all";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Search, Plus, CheckCircle, Gamepad2 } from "lucide-react";
+import AddGameHoursDialog from "../games/AddGameHoursDialog";
+import StarRating from "../games/StarRating";
+import { toast } from "sonner";
+
+export default function BrowseGameDatabaseModal({ userGames, onGameAdded, triggerButton }) {
+  const [allGames, setAllGames] = useState([]);
+  const [filteredGames, setFilteredGames] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [gameRatings, setGameRatings] = useState({});
+  const [userRatings, setUserRatings] = useState({});
+  const [currentUser, setCurrentUser] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const isGameInLibrary = (gameId) => userGames.some((ug) => ug.game_id === gameId);
+
+  const loadData = useCallback(async () => {
+    if (!open) return;
+    setIsLoading(true);
+    try {
+      const [gameData, allRatings, me] = await Promise.all([
+        Game.list(),
+        GameRating.list(),
+        User.me()
+      ]);
+      
+      gameData.sort((a, b) => a.title.localeCompare(b.title));
+
+      const ratingsMap = {};
+      allRatings.forEach(rating => {
+        if (!ratingsMap[rating.game_id]) {
+          ratingsMap[rating.game_id] = { total: 0, count: 0 };
+        }
+        ratingsMap[rating.game_id].total += rating.rating;
+        ratingsMap[rating.game_id].count += 1;
+      });
+
+      const avgRatings = {};
+      Object.keys(ratingsMap).forEach(gameId => {
+        avgRatings[gameId] = { average: ratingsMap[gameId].total / ratingsMap[gameId].count, count: ratingsMap[gameId].count };
+      });
+
+      const userRatingsMap = {};
+      allRatings.filter(r => r.user_id === me.id).forEach(r => { userRatingsMap[r.game_id] = r.rating; });
+
+      setAllGames(gameData);
+      setFilteredGames(gameData);
+      setGameRatings(avgRatings);
+      setUserRatings(userRatingsMap);
+      setCurrentUser(me);
+    } catch (error) {
+      console.error("Error loading game data:", error);
+      toast.error("Failed to load game database.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    const results = allGames.filter(game =>
+      game.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredGames(results);
+  }, [searchTerm, allGames]);
+
+  const handleAddGame = async (formData) => {
+    if (!selectedGame || !currentUser) return;
+    try {
+      await UserGame.create({
+        user_id: currentUser.id,
+        game_id: selectedGame.id,
+        hours_played: formData.hours_played,
+        skill_level: formData.skill_level,
+      });
+      if (formData.rating > 0) {
+        await handleRatingChange(selectedGame.id, formData.rating);
+      }
+      setSelectedGame(null);
+      toast.success(`${selectedGame.title} added to your library!`);
+      onGameAdded(); // Reload profile page data
+    } catch (error) {
+      console.error("Error adding game:", error);
+      toast.error(`Failed to add ${selectedGame.title}.`);
+    }
+  };
+
+  const handleRatingChange = async (gameId, rating) => {
+    if (!currentUser) return;
+    try {
+      const existingRatings = await GameRating.filter({ user_id: currentUser.id, game_id: gameId });
+      if (existingRatings.length > 0) {
+        await GameRating.update(existingRatings[0].id, { rating });
+      } else {
+        await GameRating.create({ user_id: currentUser.id, game_id: gameId, rating });
+      }
+      loadData();
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      toast.error("Failed to submit rating.");

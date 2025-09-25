@@ -1,0 +1,77 @@
+  "name": "TeamInvite",
+  "type": "object",
+  "properties": {
+    "team_id": {
+      "type": "string",
+      "description": "Reference to the team"
+    },
+    "inviter_id": {
+      "type": "string",
+      "description": "User who sent the invitation"
+    },
+    "invited_user_id": {
+      "type": "string",
+      "description": "User who was invited"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined",
+        "expired"
+      ],
+      "default": "pending",
+      "description": "Invitation status"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional invitation message"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the invitation expires"
+    }
+  },
+  "required": [
+    "team_id",
+    "inviter_id",
+    "invited_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "inviter_id": "{{user.id}}"
+        },
+        {
+          "invited_user_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {
+      "inviter_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "inviter_id": "{{user.id}}"
+        },
+        {
+          "invited_user_id": "{{user.id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "inviter_id": "{{user.id}}"
+        },
+        {
+          "invited_user_id": "{{user.id}}"
+        }
+      ]
+    }
+  }
+}

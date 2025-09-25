@@ -1,0 +1,46 @@
+import React, { useState } from 'react';
+import { Gamepad2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export default function ControllerRating({ 
+  rating = 0, 
+  onRatingChange, 
+  readonly = false, 
+  size = "w-4 h-4",
+}) {
+  const [hoverRating, setHoverRating] = useState(0);
+
+  const handleClick = (value) => {
+    if (readonly || !onRatingChange) return;
+    onRatingChange(value);
+  };
+
+  const currentRating = hoverRating || rating;
+
+  return (
+    <div className={cn("flex items-center group", readonly ? "" : "cursor-pointer")}>
+      {[1, 2, 3, 4, 5].map((value) => (
+        <Button
+          key={value}
+          type="button"
+          variant="ghost"
+          className="p-0.5 h-auto transition-transform duration-150 group-hover:scale-110"
+          onClick={() => handleClick(value)}
+          onMouseEnter={() => !readonly && setHoverRating(value)}
+          onMouseLeave={() => !readonly && setHoverRating(0)}
+          disabled={readonly}
+          aria-label={`Rate ${value} controllers`}
+        >
+          <Gamepad2
+            className={cn(
+              size, 
+              "transition-colors duration-200",
+              value <= currentRating
+                ? 'text-[#ff9500]'
+                : 'text-gray-600 group-hover:text-[#ff9500]/70'
+            )}
+            style={value <= currentRating ? {
+              filter: 'drop-shadow(0 0 4px rgba(255, 149, 0, 0.6))'
+            } : {}}
+ 

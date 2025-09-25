@@ -1,0 +1,105 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Gamepad2, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export default function PressStartButton({ onPressStart, isLoading }) {
+  return (
+    <div className="flex items-center justify-center min-h-[400px] relative">
+      {/* Retro Grid Background Effect */}
+      <div className="absolute inset-0 opacity-20">
+        <div 
+          className="w-full h-full bg-gradient-to-b from-transparent via-[#00FF41]/10 to-transparent"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}
+        />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="text-center relative z-10"
+      >
+        <motion.div
+          animate={{ 
+            textShadow: [
+              '0 0 10px rgba(255, 149, 0, 0.8)',
+              '0 0 20px rgba(255, 149, 0, 0.8)',
+              '0 0 10px rgba(255, 149, 0, 0.8)'
+            ]
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="mb-8"
+        >
+          <h1 className="matrix-font font-black text-6xl md:text-8xl tracking-wider text-center">
+            <span className="text-purple-400">NEW</span>
+            <span className="text-[#00FF41] text-8xl md:text-10xl font-black mx-[-0.2em] relative" style={{ top: '-0.1em' }}>+</span>
+            <span className="text-purple-400">GAME</span>
+          </h1>
+        </motion.div>
+
+        <motion.div
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          className="mb-8"
+        >
+          <p className="matrix-font text-xl md:text-2xl text-[#00FF41] font-bold tracking-wider">
+            READY PLAYER ONE
+          </p>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Button
+            onClick={onPressStart}
+            disabled={isLoading}
+            className="relative overflow-hidden bg-transparent border-4 border-[#00FF41] text-[#00FF41] hover:bg-[#00FF41] hover:text-black font-black text-2xl px-12 py-6 matrix-font tracking-wider transition-all duration-300 group"
+            style={{
+              boxShadow: '0 0 30px rgba(0, 255, 65, 0.5)',
+              textShadow: '0 0 10px rgba(0, 255, 65, 0.8)'
+            }}
+          >
+            <motion.div
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+              className="flex items-center gap-3"
+            >
+              <Gamepad2 className="w-8 h-8" />
+              {isLoading ? 'LOADING...' : 'PRESS START'}
+              <Zap className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+            </motion.div>
+            
+            {/* Animated border effect */}
+            <motion.div
+              className="absolute inset-0 border-2 border-[#00FF41]"
+              animate={{
+                boxShadow: [
+                  '0 0 20px rgba(0, 255, 65, 0.5)',
+                  '0 0 40px rgba(0, 255, 65, 0.8)',
+                  '0 0 20px rgba(0, 255, 65, 0.5)'
+                ]
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </Button>
+        </motion.div>
+
+        <motion.p
+          animate={{ opacity: [0.4, 0.8, 0.4] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          className="mt-6 text-gray-400 matrix-font tracking-wider"
+        >
+          Initialize your daily gaming session
+        </motion.p>
+      </motion.div>
+    </div>
+  );
+}

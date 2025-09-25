@@ -1,0 +1,54 @@
+  "name": "StatusUpdate",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user who posted the status"
+    },
+    "content": {
+      "type": "string",
+      "description": "Status update content"
+    },
+    "status_type": {
+      "type": "string",
+      "enum": [
+        "playing",
+        "looking_for_match",
+        "achievement",
+        "general",
+        "offline",
+        "online"
+      ],
+      "default": "general",
+      "description": "Type of status update"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "Game ID if status is related to a specific game"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this status is visible to all users or just matches"
+    }
+  },
+  "required": [
+    "user_id",
+    "content"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "is_public": true
+        },
+        {
+          "user_id": "{{user.id}}"
+        }
+      ]
+    },
+    "write": {
+      "user_id": "{{user.id}}"
+    }
+  }
+}

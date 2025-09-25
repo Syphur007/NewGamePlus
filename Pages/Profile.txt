@@ -1,0 +1,34 @@
+
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useLocation, Link } from "react-router-dom";
+import { User, Game, UserGame, PlayDate, Match } from "@/entities/all";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge }
+from "@/components/ui/badge";
+import { Edit3, Plus, Trophy, MapPin, Calendar, Gamepad2, Heart, Users, Lock, Twitch, Youtube, Twitter, Copy, MessageSquare, Library, AlertTriangle, Eye, EyeOff } from "lucide-react";
+import { toast, Toaster } from "sonner";
+import { cn } from "@/lib/utils";
+import { createPageUrl } from "@/utils";
+import ProfileEditor from "../components/profile/ProfileEditor";
+import GameLibrary from "../components/profile/GameLibrary";
+import FullGameLibrary from "../components/profile/FullGameLibrary";
+import BackgroundMusicPlayer from "../components/profile/BackgroundMusicPlayer";
+import PrivacyToggle from "../components/profile/PrivacyToggle";
+import MessagingSystem from "../components/profile/MessagingSystem";
+import UserActivityFeed from "../components/profile/UserActivityFeed";
+import CreateChallengeModal from "../components/feed/CreateChallengeModal";
+import TopTenManager from "../components/profile/TopTenManager";
+import NotificationCenter from "../components/profile/NotificationCenter";
+
+const uploadFileToService = async (file) => {
+  console.log("Uploading file:", file.name);
+  return new Promise(resolve => setTimeout(() => {
+    const mockUrl = URL.createObjectURL(file);
+    console.log("Mock URL:", mockUrl);
+    resolve(mockUrl);
+  }, 1000));
+};
+
+c

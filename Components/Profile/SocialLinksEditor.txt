@@ -1,0 +1,78 @@
+import React from 'react';
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { MessageSquare, Twitch, Youtube, Twitter } from 'lucide-react';
+
+export default function SocialLinksEditor({ formData, handleChange }) {
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-white">Contact & Social Links</h3>
+      <p className="text-sm text-gray-400">
+        Add ways for matches to contact you. This information will only be visible to users you've matched with.
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="discord_username" className="text-white flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-indigo-400" />
+            Contact Username
+          </Label>
+          <Input
+            id="discord_username"
+            name="discord_username"
+            value={formData.discord_username}
+            onChange={handleChange}
+            placeholder="Your preferred contact method"
+            className="bg-slate-800/50 border-purple-800/30 text-white"
+          />
+          <p className="text-xs text-gray-500">Primary way for matches to contact you</p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="twitch_username" className="text-white flex items-center gap-2">
+            <Twitch className="w-4 h-4 text-purple-400" />
+            Twitch Username
+          </Label>
+          <Input
+            id="twitch_username"
+            name="twitch_username"
+            value={formData.twitch_username}
+            onChange={handleChange}
+            placeholder="Your Twitch username"
+            className="bg-slate-800/50 border-purple-800/30 text-white"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="youtube_channel" className="text-white flex items-center gap-2">
+            <Youtube className="w-4 h-4 text-red-400" />
+            YouTube Channel
+          </Label>
+          <Input
+            id="youtube_channel"
+            name="youtube_channel"
+            value={formData.youtube_channel}
+            onChange={handleChange}
+            placeholder="Your YouTube channel URL"
+            className="bg-slate-800/50 border-purple-800/30 text-white"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="twitter_handle" className="text-white flex items-center gap-2">
+            <Twitter className="w-4 h-4 text-sky-400" />
+            Twitter/X Handle
+          </Label>
+          <Input
+            id="twitter_handle"
+            name="twitter_handle"
+            value={formData.twitter_handle}
+            onChange={handleChange}
+            placeholder="Your Twitter/X handle"
+            className="bg-slate-800/50 border-purple-800/30 text-white"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

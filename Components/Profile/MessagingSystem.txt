@@ -1,0 +1,111 @@
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Message, User, Match } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MessageCircle, Send, X, Lock } from 'lucide-react';
+import { toast } from "sonner";
+import { format } from 'date-fns';
+
+export default function MessagingSystem({ currentUser, otherUser, isOpen, onClose }) {
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [canMessage, setCanMessage] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const checkMessagingPermission = useCallback(async () => {
+    if (!currentUser || !otherUser) return;
+    
+    try {
+      // Check if users have matched
+      const matches = await Match.filter({
+        $or: [
+          { user_id: currentUser.id, matched_user_id: otherUser.id },
+          { user_id: otherUser.id, matched_user_id: currentUser.id }
+        ]
+      });
+      
+      setCanMessage(matches.length > 0);
+    } catch (error) {
+      console.error("Error checking messaging permission:", error);
+      setCanMessage(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentUser, otherUser]);
+
+  const loadMessages = useCallback(async () => {
+    if (!currentUser || !otherUser) return;
+
+    try {
+      const allMessages = await Message.filter({
+        $or: [
+          { sender_id: currentUser.id, receiver_id: otherUser.id },
+          { sender_id: otherUser.id, receiver_id: currentUser.id }
+        ]
+      }, "-created_date");
+
+      setMessages(allMessages.reverse()); // Show oldest first
+
+      // Mark messages as read
+      const unreadMessages = allMessages.filter(
+        msg => msg.receiver_id === currentUser.id && !msg.is_read
+      );
+      
+      for (const msg of unreadMessages) {
+        // In a real application, you might want to debounce or batch these updates
+        // to avoid too many writes if there are many unread messages.
+        // For simplicity and immediate effect, we're doing them in a loop.
+        await Message.update(msg.id, { is_read: true });
+      }
+    } catch (error) {
+      console.error("Error loading messages:", error);
+    }
+  }, [currentUser, otherUser]);
+
+  useEffect(() => {
+    if (isOpen && currentUser && otherUser) {
+      // Reset loading state when component opens or users change
+      setIsLoading(true); 
+      checkMessagingPermission();
+      loadMessages();
+    }
+    // Cleanup function if needed, though not strictly required for these async calls
+  }, [isOpen, currentUser, otherUser, checkMessagingPermission, loadMessages]);
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !canMessage || isSending) return;
+
+    setIsSending(true);
+    try {
+      await Message.create({
+        sender_id: currentUser.id,
+        receiver_id: otherUser.id,
+        content: newMessage.trim(),
+        message_type: 'text'
+      });
+
+      setNewMessage('');
+      toast.success("Message sent!");
+      await loadMessages();
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (

@@ -1,0 +1,40 @@
+  "name": "Match",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "First user ID"
+    },
+    "matched_user_id": {
+      "type": "string",
+      "description": "Second user ID"
+    },
+    "compatibility_score": {
+      "type": "number",
+      "description": "Compatibility score based on games"
+    },
+    "shared_games": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of shared game IDs"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "declined"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "user_id",
+    "matched_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+ 

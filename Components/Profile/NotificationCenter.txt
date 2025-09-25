@@ -1,0 +1,139 @@
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { MatchRequest, Challenge, Message, User, Game } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bell, Users, Zap, MessageSquare, Trophy, Eye, X, Check } from "lucide-react";
+import { formatDistanceToNow } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { toast } from "sonner";
+import { cn } from '@/lib/utils';
+
+const NotificationItem = ({ notification, onAction, users, games }) => {
+  const getNotificationIcon = () => {
+    switch (notification.type) {
+      case 'match_request': return <Users className="w-5 h-5 text-[#00FF41]" />;
+      case 'challenge': return notification.challenge_type === 'ar_callout' ? 
+        <Eye className="w-5 h-5 text-[#00FF41]" /> : 
+        <Zap className="w-5 h-5 text-purple-400" />;
+      case 'message': return <MessageSquare className="w-5 h-5 text-blue-400" />;
+      default: return <Bell className="w-5 h-5 text-gray-400" />;
+    }
+  };
+
+  const getNotificationContent = () => {
+    const user = users[notification.from_user_id];
+    const userName = user?.display_name || 'Unknown User';
+    
+    switch (notification.type) {
+      case 'match_request':
+        return {
+          title: `New Match Request`,
+          description: `${userName} wants to be your gaming partner! ${notification.compatibility_score}% compatible`,
+          action: 'View Request'
+        };
+      case 'challenge':
+        const gameTitle = games[notification.game_id]?.title || 'Unknown Game';
+        return {
+          title: notification.challenge_type === 'ar_callout' ? `AR Call Out!` : `Public Call Out!`,
+          description: `${userName} challenged you to ${gameTitle}`,
+          action: notification.status === 'pending' ? 'Respond' : 'View'
+        };
+      case 'message':
+        return {
+          title: `New Message`,
+          description: `${userName}: ${notification.content?.substring(0, 50)}...`,
+          action: 'Reply'
+        };
+      default:
+        return { title: 'Notification', description: 'New activity', action: 'View' };
+    }
+  };
+
+  const content = getNotificationContent();
+  const user = users[notification.from_user_id];
+
+  return (
+    <div className={cn(
+      "flex items-center gap-3 p-4 rounded-lg transition-all duration-300 hover:bg-slate-800/50",
+      notification.is_read ? 'opacity-75' : 'bg-slate-800/30 border-l-4 border-[#00FF41]'
+    )}>
+      <div className="flex-shrink-0">
+        {getNotificationIcon()}
+      </div>
+      
+      <Link to={createPageUrl(`Profile?id=${user?.id}`)} className="flex-shrink-0">
+        <Avatar className="w-10 h-10 border-2 border-purple-800/50 hover:border-purple-500/80 transition-all">
+          <AvatarImage src={user?.avatar_url} />
+          <AvatarFallback>{user?.display_name?.[0]}</AvatarFallback>
+        </Avatar>
+      </Link>
+
+      <div className="flex-1 min-w-0">
+        <h4 className="font-semibold text-white text-sm">{content.title}</h4>
+        <p className="text-gray-400 text-xs truncate">{content.description}</p>
+        <p className="text-gray-500 text-xs mt-1">
+          {formatDistanceToNow(new Date(notification.created_date), { addSuffix: true })}
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {!notification.is_read && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="bg-[#00FF41]/20 border-[#00FF41]/50 text-[#00FF41] hover:bg-[#00FF41]/30 text-xs"
+            onClick={() => onAction(notification, 'view')}
+          >
+            {content.action}
+          </Button>
+        )}
+        
+        {notification.type === 'match_request' && notification.status === 'pending' && (
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              className="bg-green-600/80 hover:bg-green-600 text-white p-1 h-6 w-6"
+              onClick={() => onAction(notification, 'accept')}
+            >
+              <Check className="w-3 h-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="bg-red-600/80 hover:bg-red-600 p-1 h-6 w-6"
+              onClick={() => onAction(notification, 'decline')}
+            >
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+        )}
+
+        {notification.type === 'challenge' && notification.status === 'pending' && notification.challenged_id === notification.current_user_id && (
+          <div className="flex gap-1">
+            <Button
+              size="sm"
+              className="bg-green-600/80 hover:bg-green-600 text-white p-1 h-6 w-6"
+              onClick={() => onAction(notification, 'accept_challenge')}
+            >
+              <Check className="w-3 h-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="bg-red-600/80 hover:bg-red-600 p-1 h-6 w-6"
+              onClick={() => onAction(notification, 'decline_challenge')}
+            >
+              <X className="w-3 h-3" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+e

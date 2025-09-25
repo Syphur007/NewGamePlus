@@ -1,0 +1,63 @@
+  "name": "GamingSession",
+  "type": "object",
+  "properties": {
+    "partnership_id": {
+      "type": "string",
+      "description": "Reference to the gaming partnership"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "Game played in this session"
+    },
+    "session_start": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the session started"
+    },
+    "session_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the session ended"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "description": "Length of session in minutes"
+    },
+    "session_type": {
+      "type": "string",
+      "enum": [
+        "competitive",
+        "casual",
+        "co-op",
+        "challenge",
+        "tournament"
+      ],
+      "default": "casual",
+      "description": "Type of gaming session"
+    },
+    "achievements_unlocked": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Any achievements unlocked during this session"
+    },
+    "session_notes": {
+      "type": "string",
+      "description": "Optional notes about the session"
+    },
+    "mood_rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "How fun was this session (1-5 stars)"
+    },
+    "screenshot_url": {
+      "type": "string",
+      "description": "Optional screenshot from the session"
+    },
+    "next_session_planned": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When they plan to play next"
+ 

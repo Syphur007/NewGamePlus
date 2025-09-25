@@ -1,0 +1,40 @@
+  "name": "NewsPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "News article title"
+    },
+    "content": {
+      "type": "string",
+      "description": "News article content"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Featured image for the article"
+    },
+    "source": {
+      "type": "string",
+      "description": "News source"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "gaming",
+        "esports",
+        "tech",
+        "reviews",
+        "updates"
+      ],
+      "default": "gaming"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ],
+ 

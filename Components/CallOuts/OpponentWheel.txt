@@ -1,0 +1,43 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Users, Zap } from "lucide-react";
+
+export default function OpponentWheel({ users, onSelect, onClose }) {
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [rotation, setRotation] = useState(0);
+
+    const spinWheel = () => {
+        if (!users || users.length === 0 || isSpinning) return;
+
+        setIsSpinning(true);
+        const spins = 5 + Math.random() * 3;
+        const finalRotation = rotation + (spins * 360);
+        setRotation(finalRotation);
+
+        setTimeout(() => {
+            const selectedIndex = Math.floor(Math.random() * users.length);
+            const selectedOpponent = users[selectedIndex];
+
+            setIsSpinning(false);
+            if (selectedOpponent && onSelect) {
+                onSelect(selectedOpponent);
+            }
+        }, 4000);
+    };
+
+    if (!users || users.length === 0) {
+        return (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <div className="bg-slate-900/90 backdrop-blur-xl border border-purple-500/50 rounded-xl p-8 text-center max-w-md">
+                    <Users className="w-16 h-16 text-purple-500 mx-auto mb-4" />
+                    <h3 className="text-xl text-white font-bold mb-2">No Users Available</h3>
+                    <p className="text-purple-200 mb-4">There are no other users available for challenges right now.</p>
+                    <Button 
+                        onClick={onClose}
+                        className="bg-purple-600 hover:bg-purple-700"
+                    >
+                        Close
+                    </Button>
+                </div>
+ 

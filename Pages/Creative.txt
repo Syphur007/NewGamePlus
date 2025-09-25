@@ -1,0 +1,39 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Youtube, Twitch, Twitter, Zap, Award, Mail } from 'lucide-react';
+
+const partnershipTiers = [
+    {
+        title: "Community Affiliate",
+        icon: Zap,
+        iconColor: "text-purple-400",
+        description: "For aspiring streamers and content creators starting their journey.",
+        perks: [
+            "Official NEW+GAME Affiliate status",
+            "Custom affiliate link",
+            "Access to exclusive Discord channel",
+            "Early access to new features"
+        ],
+        requirements: "Active NEW+GAME profile and a passion for creating gaming content."
+    },
+    {
+        title: "Official Partner",
+        icon: Award,
+        iconColor: "text-[#00FF41]",
+        description: "For established creators with a growing community.",
+        perks: [
+            "All Affiliate perks",
+            "Featured profile in the app",
+            "Co-branded marketing opportunities",
+            "Direct line to our development team",
+            "Higher revenue share on referrals"
+        ],
+        requirements: "Consistent content creation schedule and an engaged community."
+    }
+];
+
+export default function CreatorPartnershipsPage() {
+    return (
+        <div className="p-6 max-w-5xl mx-auto">
+            <div className="mb-8 text-center">
+                <h1 className="page-title text-4xl font-black tracking-wider drop-shadow-lg mb-4">

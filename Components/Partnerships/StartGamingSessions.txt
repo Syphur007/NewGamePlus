@@ -1,0 +1,99 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { X, Play, Clock, Gamepad2 } from "lucide-react";
+import { GamingSession } from "@/entities/all";
+
+const SESSION_TYPES = [
+  { value: "casual", label: "Casual Gaming", emoji: "🎮" },
+  { value: "competitive", label: "Competitive", emoji: "🏆" },
+  { value: "co-op", label: "Co-op Campaign", emoji: "🤝" },
+  { value: "challenge", label: "Challenge Mode", emoji: "⚡" },
+  { value: "tournament", label: "Tournament", emoji: "🎯" }
+];
+
+export default function StartGamingSessionDialog({ partnership, partner, currentUser, games, onClose, onStarted }) {
+  const [formData, setFormData] = useState({
+    game_id: partnership.favorite_shared_game || '',
+    session_type: 'casual',
+    estimated_duration: 120, // 2 hours default
+    session_notes: '',
+    next_session_planned: ''
+  });
+  const [isStarting, setIsStarting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsStarting(true);
+    
+    try {
+      await GamingSession.create({
+        partnership_id: partnership.id,
+        game_id: formData.game_id,
+        session_start: new Date().toISOString(),
+        duration_minutes: formData.estimated_duration,
+        session_type: formData.session_type,
+        session_notes: formData.session_notes,
+        next_session_planned: formData.next_session_planned || null
+      });
+      
+      onStarted();
+    } catch (error) {
+      console.error("Error starting gaming session:", error);
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
+  const sharedGames = games.filter(game => 
+    partnership.games_played_together?.includes(game.id)
+  );
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <Card className="bg-slate-900/95 backdrop-blur-xl border-purple-800/50 w-full max-w-lg">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white flex items-center gap-2">
+              <Play className="w-6 h-6 text-green-400" />
+              Start Gaming Session
+            </CardTitle>
+            <Button variant="ghost" size="icon" onClick={onClose} className="text-gray-400 hover:text-white">
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
+          <p className="text-gray-400">Log a gaming session with {partner.display_name} to level up your partnership!</p>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-white">Game</Label>
+              <Select
+                value={formData.game_id}
+                onValueChange={(value) => setFormData(p => ({ ...p, game_id: value }))}
+                required
+              >
+                <SelectTrigger className="bg-slate-800/50 border-purple-800/30 text-white">
+                  <SelectValue placeholder="Select a game to play" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sharedGames.length > 0 ? (
+                    sharedGames.map(game => (
+                      <SelectItem key={game.id} value={game.id}>{game.title}</SelectItem>
+                    ))
+                  ) : (
+                    games.map(game => (
+                      <SelectItem key={game.id} value={game.id}>{game.title}</SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white">Session Type</Label>
+ 

@@ -1,0 +1,45 @@
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { X, Plus, Search, Gamepad2, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
+import { UserGame, Game } from "@/entities/all";
+import CreateGameDialog from "./CreateGameDialog";
+
+export default function BulkAddGamesDialog({
+  games,
+  userGames,
+  onSave,
+  onCancel,
+  currentUser
+}) {
+  const [selectedGames, setSelectedGames] = useState(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCreateGame, setShowCreateGame] = useState(false);
+
+  // Filter out games already in user's library
+  const userGameIds = new Set(userGames.map(ug => ug.game_id));
+  const availableGames = games.filter(game => !userGameIds.has(game.id));
+
+  const filteredGames = availableGames.filter(game =>
+    game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (game.genre && game.genre.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const handleGameToggle = (gameId) => {
+    setSelectedGames(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(gameId)) {
+        newSet.delete(gameId);
+      } else {
+        newSet.add(gameId);
+      }
+      return newSet;
+    });
+  };

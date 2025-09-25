@@ -1,0 +1,45 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { X, Plus, Library, Clock, Trophy } from "lucide-react";
+import StarRating from "./StarRating";
+
+const SKILL_LEVELS = [
+  { value: "beginner", label: "Beginner", description: "New to this game, learning basics" },
+  { value: "intermediate", label: "Intermediate", description: "Comfortable with mechanics, improving" },
+  { value: "advanced", label: "Advanced", description: "Skilled player, knows strategies" },
+  { value: "expert", label: "Expert", description: "Master level, competitive ready" }
+];
+
+export default function AddGameHoursDialog({ game, onSave, onCancel }) {
+  const [formData, setFormData] = useState({
+    hours_played: "",
+    skill_level: "intermediate",
+    rating: 0
+  });
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.hours_played || parseInt(formData.hours_played) < 1) {
+      newErrors.hours_played = "Hours played must be at least 1";
+    }
+    
+    if (parseInt(formData.hours_played) > 50000) {
+      newErrors.hours_played = "Please enter a realistic number of hours";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }

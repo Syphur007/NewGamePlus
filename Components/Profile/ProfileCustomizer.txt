@@ -1,0 +1,139 @@
+import React, { useState } from 'react';
+import { User } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Settings, Trophy, Sparkles, Lock, Unlock } from 'lucide-react';
+import { toast } from "sonner";
+
+const WIDGET_LAYOUTS = [
+  { id: 'default', name: 'Classic Layout', description: 'Traditional two-column layout' },
+  { id: 'gaming_focus', name: 'Gaming Focus', description: 'TTMS and library prioritized' },
+  { id: 'social_focus', name: 'Social Focus', description: 'Activity and notifications highlighted' },
+  { id: 'custom_grid', name: 'Custom Grid', description: 'Fully customizable widget positions' }
+];
+
+export default function ProfileCustomizer({ user, isUnlocked, onLayoutChange, onClose }) {
+  const [selectedLayout, setSelectedLayout] = useState(user?.profile_layout || 'default');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveLayout = async () => {
+    setIsSaving(true);
+    try {
+      await User.updateMyUserData({ profile_layout: selectedLayout });
+      onLayoutChange(selectedLayout);
+      toast.success("Profile layout saved!");
+      onClose();
+    } catch (error) {
+      console.error("Error saving layout:", error);
+      toast.error("Failed to save profile layout");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!isUnlocked) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <Card className="neon-border-pink card-neon-pink w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="neon-text-pink flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              Profile Customization Locked
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <Trophy className="w-16 h-16 text-gray-500 mx-auto" />
+            <div>
+              <h3 className="text-lg font-bold text-white mb-2">Complete Your Profile First!</h3>
+              <p className="text-gray-400 text-sm">
+                Reach 100% profile completion to unlock the ability to customize your widget layout and truly make your profile unique!
+              </p>
+            </div>
+            
+            <div className="neon-border-green card-neon-green rounded-lg p-3">
+              <h4 className="neon-text-green font-bold text-sm mb-2">🎯 Unlock Rewards:</h4>
+              <ul className="text-xs text-[#00FF41] space-y-1">
+                <li>• Custom widget arrangements</li>
+                <li>• Premium layout options</li>
+                <li>• Enhanced profile visibility</li>
+                <li>• Exclusive customization badges</li>
+              </ul>
+            </div>
+            
+            <Button onClick={onClose} className="w-full">
+              Got It!
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <Card className="neon-border-green card-neon-green w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+        <CardHeader>
+          <CardTitle className="neon-text-green flex items-center gap-2">
+            <Sparkles className="w-5 h-5" />
+            Profile Customization (UNLOCKED!)
+          </CardTitle>
+          <p className="text-gray-400 text-sm">
+            Customize your profile layout to showcase what matters most to you!
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {WIDGET_LAYOUTS.map((layout) => (
+              <div
+                key={layout.id}
+                className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                  selectedLayout === layout.id
+                    ? 'neon-border-green card-neon-green'
+                    : 'border-slate-600 hover:border-purple-500'
+                }`}
+                onClick={() => setSelectedLayout(layout.id)}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-semibold text-white">{layout.name}</h3>
+                  {selectedLayout === layout.id && (
+                    <Badge className="bg-[#00FF41] text-black">Selected</Badge>
+                  )}
+                </div>
+                <p className="text-gray-400 text-sm">{layout.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="neon-border-pink card-neon-pink rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Trophy className="w-5 h-5 text-pink-400" />
+              <span className="neon-text-pink font-bold">Profile Master Benefits</span>
+            </div>
+            <ul className="text-xs text-pink-200 space-y-1">
+              <li>✨ Enhanced matching visibility (+25% more profile views)</li>
+              <li>🎯 Priority in discovery algorithms</li>
+              <li>💎 Exclusive "Profile Master" badge</li>
+              <li>🚀 Early access to new customization features</li>
+            </ul>
+          </div>
+
+          <div className="flex justify-end gap-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveLayout}
+              disabled={isSaving}
+              className="bg-gradient-to-r from-purple-600 to-[#00FF41] hover:from-purple-700 hover:to-[#00D035]"
+            >
+              {isSaving ? 'Saving...' : 'Save Layout'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

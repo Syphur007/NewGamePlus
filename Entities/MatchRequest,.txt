@@ -1,0 +1,54 @@
+  "name": "MatchRequest",
+  "type": "object",
+  "properties": {
+    "requester_id": {
+      "type": "string",
+      "description": "User who initiated the match request"
+    },
+    "requested_id": {
+      "type": "string",
+      "description": "User who received the match request"
+    },
+    "requester_response": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "wants_playdate",
+        "not_interested"
+      ],
+      "default": "wants_playdate",
+      "description": "Requester's response to setting up a play date"
+    },
+    "requested_response": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "wants_playdate",
+        "not_interested"
+      ],
+      "default": "pending",
+      "description": "Requested user's response to setting up a play date"
+    },
+    "shared_games": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of shared game IDs between users"
+    },
+    "compatibility_score": {
+      "type": "number",
+      "description": "Compatibility score between users"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "both_interested",
+        "declined",
+        "play_date_created"
+      ],
+      "default": "pending",
+      "description": "Overall status of the match request"
+    }
+ 

@@ -1,0 +1,34 @@
+import React, { useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Users, Zap, Trophy, Search, Target, Shield, Rocket } from 'lucide-react';
+import { User } from "@/entities/User";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+
+export default function LandingPage() {
+  // SEO optimization for landing page
+  useEffect(() => {
+    document.title = "NEW+GAME - Find Your Perfect Gaming Partner | Top Ten Matching System™";
+    
+    const metaDesc = document.querySelector('meta[name="description"]') || document.createElement('meta');
+    metaDesc.name = 'description';
+    metaDesc.content = 'Join thousands of gamers using NEW+GAME\'s revolutionary Top Ten Matching System™ to find perfect gaming partners. Free gaming matchmaking platform for PC, Console, Mobile & VR players.';
+    if (!document.querySelector('meta[name="description"]')) {
+      document.head.appendChild(metaDesc);
+    }
+
+    const keywords = document.querySelector('meta[name="keywords"]') || document.createElement('meta');
+    keywords.name = 'keywords';
+    keywords.content = 'gaming partners, gaming matchmaking, find gaming friends, gaming community, multiplayer gaming, TOP TEN MATCHING SYSTEM, player matching, gaming social network, gaming platform, esports';
+    if (!document.querySelector('meta[name="keywords"]')) {
+      document.head.appendChild(keywords);
+    }
+  }, []);
+
+  const handleJoinNow = async () => {
+    try {
+      await User.login();
+    } catch (error) {
+ 

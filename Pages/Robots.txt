@@ -1,0 +1,39 @@
+
+export default function RobotsPage() {
+  useEffect(() => {
+    document.title = 'NEW+GAME Robots.txt';
+  }, []);
+
+  const robotsTxt = `# NEW+GAME Robots.txt
+# Gaming Partnership Platform - https://newgameplus.app
+
+User-agent: *
+
+# Allow all major pages for better discoverability
+Allow: /
+Allow: /Landing
+Allow: /Discover  
+Allow: /GameDatabase
+Allow: /TeamUp
+Allow: /CallOuts
+Allow: /ActivityFeed
+Allow: /HowTo
+Allow: /HowMatching
+Allow: /CreatorPartnerships
+Allow: /GameNews
+Allow: /Terms
+Allow: /Privacy
+Allow: /CookiePolicy
+Allow: /LegalNotice
+
+# Block private user areas (but allow public profiles)
+Disallow: /Profile?id=*&edit=true
+Disallow: /Messages
+Disallow: /Matches
+Disallow: /PlayDates  
+Disallow: /GamingPartnerships
+
+# Block admin-only pages
+Disallow: /GameManagement
+Disallow: /admin/
+Disallow: /dashboard/

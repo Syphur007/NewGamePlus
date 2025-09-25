@@ -1,0 +1,34 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle } from "lucide-react";
+
+export default function LegalNoticePage() {
+    return (
+        <div className="p-6 max-w-4xl mx-auto space-y-6">
+            <Card className="bg-slate-900/50 backdrop-blur-xl border-purple-800/30">
+                <CardHeader>
+                    <CardTitle className="text-white text-3xl flex items-center gap-3">
+                        <AlertTriangle className="w-8 h-8 text-[#00FF41]" />
+                        Legal & Intellectual Property Notice
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="text-gray-300 space-y-4 prose prose-invert max-w-none">
+                     <p className="text-gray-400">Last updated: {new Date().toLocaleDateString()}</p>
+                    <p className="font-bold text-red-400">
+                        IMPORTANT: This is a placeholder for your Legal Notice. You MUST consult with a legal professional.
+                    </p>
+
+                    <h2>Ownership of Intellectual Property</h2>
+                    <p>The NEW+GAME application, including its source code, graphical assets, user interface, and overall "look and feel" are the exclusive property of NEW+GAME.</p>
+                    
+                    <h2>Proprietary Matching Systems</h2>
+                    <p>The concepts, algorithms, and implementations of the <strong className="text-[#00FF41]">"Top Ten Matching System™"</strong> and <strong className="text-purple-300">"Hours Played Intelligence™"</strong> are proprietary, trade-secret, and trademarked technologies. They are protected under U.S. and International intellectual property laws.</p>
+                    <p>Any attempt to reverse-engineer, copy, or otherwise replicate these systems is strictly forbidden and will be subject to legal action.</p>
+
+                    <h2>DMCA Notice and Takedown Procedure</h2>
+                    <p>NEW+GAME respects the intellectual property rights of others. If you believe that your copyright has been infringed by any content on our service, please provide our Copyright Agent with a written notice containing the required information as outlined in the Digital Millennium Copyright Act (DMCA).</p>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}

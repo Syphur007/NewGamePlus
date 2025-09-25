@@ -1,0 +1,34 @@
+
+import React, { useState, useEffect, useCallback } from "react";
+import { NewsPost, User, UserGame, Game, StatusUpdate, Challenge, Match, Message } from "@/entities/all";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RefreshCcw, Plus, TrendingUp, Users, Gamepad2, Trophy, Send } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+
+import PressStartButton from "../components/home/PressStartButton";
+import DailySessionUnlock from "../components/home/DailySessionUnlock";
+import FeedItem from "../components/feed/FeedItem";
+import PostUpdateForm from "../components/feed/PostUpdateForm";
+import CreateChallengeModal from "../components/feed/CreateChallengeModal";
+
+// Daily Mission Generator
+const generateDailyMission = (user, userGames, allUsers) => {
+  const missions = [
+    {
+      type: "scout",
+      title: "Profile Explorer",
+      description: "Discover and view 3 new player profiles to expand your gaming network.",
+      target_progress: 3,
+      current_progress: 0,
+      xp_reward: 150,
+      difficulty: "easy"
+    },
+    {
+      type: "social", 
+      title: "Connection Builder",
+      description: "Send messages or match requests to 2 potential gaming partners.",
+      target_progress: 2,
+ 

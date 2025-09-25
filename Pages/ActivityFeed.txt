@@ -1,0 +1,201 @@
+import React, { useState, useEffect } from 'react';
+import { StatusUpdate, Challenge, User, Game } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Activity, Plus, MessageCircle, Zap, Trophy, Eye, Users, Clock } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { formatDistanceToNow } from 'date-fns';
+import FeedItem from '../components/feed/FeedItem';
+import PostUpdateForm from '../components/feed/PostUpdateForm';
+import CreateChallengeModal from '../components/feed/CreateChallengeModal';
+import { toast } from 'sonner';
+
+export default function ActivityFeedPage() {
+  const [feedItems, setFeedItems] = useState([]);
+  const [users, setUsers] = useState({});
+  const [games, setGames] = useState({});
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showChallengeModal, setShowChallengeModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const loadFeedData = async () => {
+    try {
+      const me = await User.me().catch(() => null);
+      setCurrentUser(me);
+
+      // Get ALL public posts and challenges - not filtered by matches
+      const [allStatusUpdates, allChallenges, allUsers, allGames] = await Promise.all([
+        StatusUpdate.filter({ is_public: true }, "-created_date", 50), // Get all public status updates
+        Challenge.list("-created_date", 30), // Get all challenges 
+        User.list(),
+        Game.list()
+      ]);
+
+      // Combine all feed items
+      const combinedFeed = [
+        ...allStatusUpdates.map(item => ({ ...item, type: 'status' })),
+        ...allChallenges.map(item => ({ ...item, type: 'challenge' }))
+      ].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+
+      setFeedItems(combinedFeed);
+      setUsers(allUsers.reduce((acc, u) => ({ ...acc, [u.id]: u }), {}));
+      setGames(allGames.reduce((acc, g) => ({ ...acc, [g.id]: g }), {}));
+
+    } catch (error) {
+      console.error("Error loading activity feed:", error);
+      toast.error("Failed to load activity feed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFeedData();
+  }, []);
+
+  const handleStatusPosted = () => {
+    loadFeedData(); // Refresh the feed
+    toast.success("Status posted to the community!");
+  };
+
+  const handleChallengeCreated = () => {
+    setShowChallengeModal(false);
+    loadFeedData(); // Refresh the feed
+    toast.success("Challenge sent!");
+  };
+
+  // Filter feed items based on search
+  const filteredFeedItems = feedItems.filter(item => {
+    if (!searchTerm) return true;
+    
+    const user = users[item.user_id || item.challenger_id];
+    const game = games[item.game_id];
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      user?.display_name?.toLowerCase().includes(searchLower) ||
+      user?.full_name?.toLowerCase().includes(searchLower) ||
+      item.content?.toLowerCase().includes(searchLower) ||
+      game?.title?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="page-title text-4xl font-black tracking-wider mb-4 bg-gradient-to-r from-purple-400 via-[#00FF41] to-purple-600 bg-clip-text text-transparent drop-shadow-lg">
+          <Activity className="w-10 h-10 inline-block mr-3 text-[#00FF41]" />
+          Community Activity Feed
+        </h1>
+        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          See what the entire NEW+GAME community is up to! Post updates, send challenges, and discover amazing gamers.
+        </p>
+      </div>
+
+      {/* Post Update Form */}
+      {currentUser && (
+        <div className="neon-border-pink card-neon-pink">
+          <PostUpdateForm 
+            currentUser={currentUser} 
+            onStatusPosted={handleStatusPosted}
+            onOpenChallengeModal={() => setShowChallengeModal(true)}
+          />
+        </div>
+      )}
+
+      {/* Search Bar */}
+      <Card className="neon-border-purple card-neon-purple backdrop-blur-xl">
+        <CardContent className="p-4">
+          <div className="flex gap-4 items-center">
+            <div className="flex-1 relative">
+              <Input
+                placeholder="Search community posts, challenges, users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-slate-800/50 border-purple-800/30 text-white pl-4"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Users className="w-4 h-4" />
+              <span>{Object.keys(users).length} community members</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Feed Items */}
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+            <p className="text-gray-400">Loading community activity...</p>
+          </div>
+        ) : filteredFeedItems.length > 0 ? (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-gray-400">
+                Showing {filteredFeedItems.length} recent activities from the community
+              </p>
+              <Button
+                onClick={loadFeedData}
+                variant="outline"
+                size="sm"
+                className="border-[#00FF41]/50 text-[#00FF41] hover:bg-[#00FF41]/20"
+              >
+                Refresh Feed
+              </Button>
+            </div>
+            
+            {filteredFeedItems.map((item) => (
+              <FeedItem
+                key={`${item.type}-${item.id}`}
+                item={item}
+                currentUser={currentUser}
+                users={users}
+                games={games}
+                onUpdate={loadFeedData}
+              />
+            ))}
+          </>
+        ) : (
+          <Card className="bg-slate-900/50 backdrop-blur-xl border-purple-800/30">
+            <CardContent className="text-center py-12">
+              <MessageCircle className="w-12 h-12 mx-auto mb-4 text-gray-500" />
+              <h3 className="text-xl font-bold text-white mb-2">No Community Activity Yet</h3>
+              <p className="text-gray-400 mb-6">
+                {searchTerm 
+                  ? `No posts found matching "${searchTerm}". Try a different search.`
+                  : "Be the first to post an update or send a challenge to get the community started!"
+                }
+              </p>
+              {!searchTerm && currentUser && (
+                <Button 
+                  onClick={() => setShowChallengeModal(true)}
+                  className="bg-gradient-to-r from-purple-500 to-[#00FF41] hover:from-purple-600 hover:to-[#00D035] text-black font-bold"
+                >
+                  <Zap className="w-5 h-5 mr-2" />
+                  Send First Challenge
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Challenge Modal */}
+      {showChallengeModal && currentUser && (
+        <CreateChallengeModal
+          currentUser={currentUser}
+          onClose={() => setShowChallengeModal(false)}
+          onChallengeCreated={handleChallengeCreated}
+        />
+      )}
+    </div>
+  );
+}

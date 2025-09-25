@@ -1,0 +1,147 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Clock, Gamepad2, X } from "lucide-react";
+import { format, addHours, startOfTomorrow, addDays } from 'date-fns';
+
+const TIME_SLOTS = [
+    { value: 9, label: "9:00 AM" },
+    { value: 12, label: "12:00 PM" },
+    { value: 15, label: "3:00 PM" },
+    { value: 18, label: "6:00 PM" },
+    { value: 21, label: "9:00 PM" }
+];
+
+const DURATIONS = [
+    { value: 60, label: "1 Hour" },
+    { value: 90, label: "1.5 Hours" },
+    { value: 120, label: "2 Hours" },
+    { value: 180, label: "3 Hours" }
+];
+
+export default function PlayDateTimeSelector({ otherUser, sharedGames, onTimeSelected, onCancel }) {
+    const [selectedDay, setSelectedDay] = useState("");
+    const [selectedTime, setSelectedTime] = useState("");
+    const [selectedGame, setSelectedGame] = useState("");
+    const [selectedDuration, setSelectedDuration] = useState(120);
+
+    // Generate next 7 days as options
+    const dayOptions = [];
+    for (let i = 0; i < 7; i++) {
+        const day = addDays(startOfTomorrow(), i);
+        dayOptions.push({
+            value: day.toISOString().split('T')[0],
+            label: format(day, 'EEEE, MMM d')
+        });
+    }
+
+    const handleSchedule = () => {
+        if (!selectedDay || !selectedTime || !selectedGame) return;
+
+        const [year, month, day] = selectedDay.split('-').map(Number);
+        const sessionDate = new Date(year, month - 1, day, parseInt(selectedTime));
+
+        onTimeSelected(sessionDate, selectedGame, selectedDuration);
+    };
+
+    return (
+        <Card className="bg-slate-900/50 backdrop-blur-xl border-purple-800/30">
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <CardTitle className="text-white flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-purple-400" />
+                        Schedule with {otherUser.display_name}
+                    </CardTitle>
+                    <Button variant="ghost" size="icon" onClick={onCancel}>
+                        <X className="w-4 h-4" />
+                    </Button>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <label className="text-white font-medium">Choose Day</label>
+                        <Select value={selectedDay} onValueChange={setSelectedDay}>
+                            <SelectTrigger className="bg-slate-800/50 border-purple-800/30 text-white">
+                                <SelectValue placeholder="Select a day" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {dayOptions.map(day => (
+                                    <SelectItem key={day.value} value={day.value}>
+                                        {day.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-white font-medium">Choose Time</label>
+                        <Select value={selectedTime} onValueChange={setSelectedTime}>
+                            <SelectTrigger className="bg-slate-800/50 border-purple-800/30 text-white">
+                                <SelectValue placeholder="Select time" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {TIME_SLOTS.map(slot => (
+                                    <SelectItem key={slot.value} value={slot.value.toString()}>
+                                        {slot.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-white font-medium">Choose Game</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {sharedGames.map(game => (
+                            <Button
+                                key={game.id}
+                                variant={selectedGame === game.id ? "default" : "outline"}
+                                className={`p-3 text-left ${
+                                    selectedGame === game.id 
+                                        ? 'bg-purple-600 text-white' 
+                                        : 'bg-slate-800/50 border-purple-800/30 text-gray-300 hover:bg-slate-700/50'
+                                }`}
+                                onClick={() => setSelectedGame(game.id)}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Gamepad2 className="w-4 h-4" />
+                                    <span className="text-sm font-medium">{game.title}</span>
+                                </div>
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-white font-medium">Session Duration</label>
+                    <Select value={selectedDuration.toString()} onValueChange={(value) => setSelectedDuration(parseInt(value))}>
+                        <SelectTrigger className="bg-slate-800/50 border-purple-800/30 text-white">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {DURATIONS.map(duration => (
+                                <SelectItem key={duration.value} value={duration.value.toString()}>
+                                    {duration.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <Button
+                    onClick={handleSchedule}
+                    disabled={!selectedDay || !selectedTime || !selectedGame}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600"
+                >
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Schedule Play Date
+                </Button>
+            </CardContent>
+        </Card>
+    );
+}

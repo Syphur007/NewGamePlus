@@ -1,0 +1,133 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Zap, X, Trophy, Target } from 'lucide-react';
+import DailyMissionCard from './DailyMissionCard';
+import MatchOfTheDay from './MatchOfTheDay';
+
+export default function DailySessionUnlock({ isOpen, onClose, mission, matchOfDay }) {
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => setShowContent(true), 1000);
+      return () => clearTimeout(timer);
+    }
+    setShowContent(false);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-modals flex items-center justify-center p-4">
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.5, opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="w-full max-w-6xl relative"
+        >
+          {/* Boot-up Animation */}
+          {!showContent && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center"
+            >
+              <motion.div
+                animate={{ 
+                  textShadow: [
+                    '0 0 20px rgba(0, 255, 65, 0.8)',
+                    '0 0 40px rgba(0, 255, 65, 0.8)',
+                    '0 0 20px rgba(0, 255, 65, 0.8)'
+                  ]
+                }}
+                transition={{ duration: 1.5, repeat: 2 }}
+                className="matrix-font font-black text-6xl text-[#00FF41] mb-4"
+              >
+                SYSTEM INITIALIZED
+              </motion.div>
+              
+              <motion.div
+                animate={{ width: ["0%", "100%"] }}
+                transition={{ duration: 2, ease: "easeInOut" }}
+                className="h-2 bg-[#00FF41] mx-auto mb-4 rounded-full max-w-md"
+              />
+              
+              <motion.p
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="matrix-font text-[#00FF41] text-xl"
+              >
+                Loading daily session data...
+              </motion.p>
+            </motion.div>
+          )}
+
+          {/* Main Content */}
+          <AnimatePresence>
+            {showContent && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <Card className="bg-slate-900/95 backdrop-blur-xl border-[#00FF41]/50 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#00FF41]/5 via-transparent to-purple-500/5" />
+                  
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+
+                  <CardContent className="p-8 relative">
+                    <motion.div
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-center mb-8"
+                    >
+                      <h2 className="matrix-font font-black text-4xl md:text-5xl mb-4">
+                        <span className="text-[#00FF41]">SESSION</span>
+                        <span className="text-purple-400 mx-3">ACTIVE</span>
+                        <Zap className="inline w-12 h-12 text-yellow-400" />
+                      </h2>
+                      <p className="text-gray-300 text-lg matrix-font">
+                        Your daily gaming objectives are now available
+                      </p>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <DailyMissionCard mission={mission} />
+                      <MatchOfTheDay match={matchOfDay} />
+                    </div>
+
+                    <motion.div
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                      className="text-center mt-8 pt-6 border-t border-[#00FF41]/30"
+                    >
+                      <p className="text-[#00FF41] matrix-font font-bold text-lg mb-2">
+                        🎮 DAILY SESSION ACTIVATED
+                      </p>
+                      <p className="text-gray-400 text-sm">
+                        Check back tomorrow for new missions and matches. Good luck, gamer!
+                      </p>
+                    </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}

@@ -1,0 +1,40 @@
+  "name": "GameRating",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user who rated the game"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "ID of the game being rated"
+    },
+    "rating": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Star rating from 1 to 5"
+    },
+    "review": {
+      "type": "string",
+      "description": "Optional written review"
+    }
+  },
+  "required": [
+    "user_id",
+    "game_id",
+    "rating"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_id": "{{user.id}}"
+    },
+    "update": {
+      "user_id": "{{user.id}}"
+    },
+    "delete": {
+      "user_id": "{{user.id}}"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { User, UserGame } from "@/entities/all";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, SlidersHorizontal, Trophy, Filter, X } from 'lucide-react';
+import UserCard from '../components/discover/UserCard';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+// Main matching function
+const calculateCompatibility = (currentUser, targetUser, currentUserGames, targetUserGames) => {
+  let score = 0;
+  let sharedTopTenGames = [];
+
+  const currentUserTopTen = currentUserGames.filter(g => g.is_top_ten);
+  const targetUserTopTen = targetUserGames.filter(g => g.is_top_ten);
+
+  // 1. Shared Top Ten Games (major impact, up to 60 points)
+  currentUserTopTen.forEach(myGame => {
+    const theirGame = targetUserTopTen.find(g => g.game_id === myGame.game_id);
+    if (theirGame) {
+      score += 10; // Base points for a shared game
+      
+      // Bonus for similar skill (up to 3 points)
+      const skillLevels = { beginner: 1, intermediate: 2, advanced: 3, expert: 4 };
+      const skillDiff = Math.abs((skillLevels[myGame.skill_level] || 2) - (skillLevels[theirGame.skill_level] || 2));
+      score += (3 - skillDiff);
+
+      // Bonus for similar hours (up to 3 points)
+      const hoursDiff = Math.abs(myGame.hours_played - theirGame.hours_played);
+      if (hoursDiff < 50) score += 3;
+      else if (hoursDiff < 200) score += 1;
+ 

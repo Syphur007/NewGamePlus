@@ -1,0 +1,46 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { X, Save, Gamepad2 } from "lucide-react";
+import StarRating from "./StarRating";
+import { UserGame, GameRating } from "@/entities/all";
+import { toast } from "sonner";
+
+const SKILL_LEVELS = [
+  { value: "beginner", label: "Beginner" },
+  { value: "intermediate", label: "Intermediate" },
+  { value: "advanced", label: "Advanced" },
+  { value: "expert", label: "Expert" }
+];
+
+export default function EditGameDetailsDialog({ 
+  userGame, 
+  game, 
+  currentUser, 
+  userRating = 0,
+  onSave, 
+  onCancel 
+}) {
+  const [formData, setFormData] = useState({
+    hours_played: userGame.hours_played || 1,
+    skill_level: userGame.skill_level || "intermediate",
+    rating: userRating || 0
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Update UserGame
+      await UserGame.update(userGame.id, {
+        hours_played: parseInt(formData.hours_played) || 1,
+        skill_level: formData.skill_level
+      });
+
+      // Handle rating
+ 

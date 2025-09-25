@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Upload, Image, Video, X, Plus } from 'lucide-react';
+import { UploadFile } from "@/integrations/Core";
+
+export default function MediaUploader({ 
+  images = [], 
+  videos = [], 
+  onImagesChange, 
+  onVideosChange 
+}) {
+  const [uploading, setUploading] = useState({ image: false, video: false });
+  const [manualUrls, setManualUrls] = useState({ image: '', video: '' });
+
+  const handleFileUpload = async (file, type) => {
+    setUploading(prev => ({ ...prev, [type]: true }));
+    
+    try {
+      const result = await UploadFile({ file });
+      
+      if (type === 'image') {
+        onImagesChange([...images, result.file_url]);
+      } else if (type === 'video') {
+        onVideosChange([...videos, result.file_url]);
+      }
+      
+    } catch (error) {
+      console.error(`Error uploading ${type}:`, error);
+    } finally {
+      setUploading(prev => ({ ...prev, [type]: false }));
+    }
+  };
+
+  const handleManualAdd = (type) => {
+    const url = manualUrls[type].trim();
+    if (!url) return;
+
+    if (type === 'image') {
+      onImagesChange([...images, url]);
+    } else if (type === 'video') {
+      onVideosChange([...videos, url]);
+    }
+    
+    setManualUrls(prev => ({ ...prev, [type]: '' }));
+  };
+
+  const removeItem = (index, type) => {
+    if (type === 'image') {
+      onImagesChange(images.filter((_, i) => i !== index));
+    } else if (type === 'video') {
+      onVideosChange(videos.filter((_, i) => i !== index));
+    }
+  };
+
+  return (
+    <Card className="bg-slate-900/50 backdrop-blur-xl border-purple-800/30">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center gap-2">
+          <Upload className="w-5 h-5" />
+          Media Gallery
+        </CardTitle>
+        <p className="text-gray-400 text-sm">Upload photos and videos to showcase your gaming setup and highlights</p>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="photos" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="photos">Photos</TabsTrigger>
+            <TabsTrigger value="videos">Videos</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="photos" className="space-y-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ 

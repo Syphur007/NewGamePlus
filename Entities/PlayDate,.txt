@@ -1,0 +1,40 @@
+  "name": "PlayDate",
+  "type": "object",
+  "properties": {
+    "match_id": {
+      "type": "string",
+      "description": "Reference to the Match"
+    },
+    "proposer_id": {
+      "type": "string",
+      "description": "User who proposed the date"
+    },
+    "receiver_id": {
+      "type": "string",
+      "description": "User who received the proposal"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "Game to be played"
+    },
+    "session_datetime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Scheduled date and time for the session"
+    },
+    "session_length_minutes": {
+      "type": "number",
+      "description": "Duration of the session in minutes"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "accepted",
+        "declined",
+        "completed",
+        "cancelled"
+      ],
+      "default": "proposed"
+    },
+ 

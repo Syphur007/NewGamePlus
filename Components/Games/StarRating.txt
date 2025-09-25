@@ -1,0 +1,45 @@
+import React, { useState } from 'react';
+import { Star } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+export default function StarRating({ 
+  rating = 0, 
+  onRatingChange, 
+  readonly = false, 
+  size = "w-4 h-4",
+  averageRating = null,
+  totalRatings = 0,
+  showText = true,
+}) {
+  const [hoverRating, setHoverRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleClick = async (starValue) => {
+    if (readonly || !onRatingChange) return;
+    
+    setIsSubmitting(true);
+    try {
+      await onRatingChange(starValue);
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const displayRating = averageRating !== null ? averageRating : rating;
+  const currentRating = hoverRating || displayRating;
+
+  return (
+    <div className="flex flex-col items-start gap-1">
+      <div className={cn("flex items-center group", readonly ? "" : "cursor-pointer")}>
+        {[1, 2, 3, 4, 5].map((starValue) => (
+          <Button
+            key={starValue}
+            type="button"
+            variant="ghost"
+            className={cn(
+              "p-0.5 h-auto transition-transform duration-150", 
+              !readonly && "group-hover:scale-110",
+              isSubmitting ? "opacity-50" : ""

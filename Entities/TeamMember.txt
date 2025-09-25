@@ -1,0 +1,68 @@
+  "name": "TeamMember",
+  "type": "object",
+  "properties": {
+    "team_id": {
+      "type": "string",
+      "description": "Reference to the team"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Reference to the user"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "leader",
+        "co-leader",
+        "member"
+      ],
+      "default": "member",
+      "description": "Role within the team"
+    },
+    "join_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the user joined the team"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "kicked"
+      ],
+      "default": "active",
+      "description": "Member status"
+    }
+  },
+  "required": [
+    "team_id",
+    "user_id"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "user_id": "{{user.id}}"
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_id": "{{user.id}}"
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+  "name": "GameDateAvailability",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user setting availability"
+    },
+    "available_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date user is available"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Start time in HH:MM format"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "End time in HH:MM format"
+    },
+    "session_length_hours": {
+      "type": "number",
+      "default": 1,
+      "description": "Length of gaming session in hours"
+    },
+    "preferred_games": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of game IDs user wants to play during this slot"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this availability is visible to potential matches"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional notes about this gaming session"
+    }
+  },
+  "required": [
+    "user_id",
+    "available_date",
+    "start_time",
+    "end_time"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_id": "{{user.id}}"
+ 

@@ -1,0 +1,139 @@
+
+import React, { useState, useEffect } from 'react';
+import { UserGame, Game, User } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Trophy, Plus, Minus, Search, Gamepad2, X, Clock, Star } from "lucide-react";
+import { toast } from "sonner";
+
+export default function TopTenManager({ userGames, games, onClose, onUpdate, currentUser }) {
+    const [profileLibrary, setProfileLibrary] = useState([]);
+    const [topTenList, setTopTenList] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const library = userGames.filter(ug => !ug.is_top_ten);
+        const topTen = userGames.filter(ug => ug.is_top_ten).sort((a, b) => (a.priority_rank || 999) - (b.priority_rank || 999));
+        
+        setProfileLibrary(library);
+        setTopTenList(topTen);
+    }, [userGames]);
+
+    const addToTopTen = async (userGame) => {
+        if (topTenList.length >= 10) {
+            toast.error("Your Top Ten Matching System™ is full! Remove a game first.", {
+                description: "The Top Ten Matching System™ limits you to 10 games for optimal matching."
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const newRank = topTenList.length + 1;
+            await UserGame.update(userGame.id, { 
+                is_top_ten: true, 
+                priority_rank: newRank 
+            });
+            
+            toast.success(`Added to Top Ten Matching System™!`, {
+                description: `${games.find(g => g.id === userGame.game_id)?.title} is now #${newRank} in your Top Ten Matching System™`
+            });
+            onUpdate();
+        } catch (error) {
+            console.error("Error adding to Top Ten:", error);
+            toast.error("Failed to add game to Top Ten Matching System™.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const removeFromTopTen = async (userGame) => {
+        setIsLoading(true);
+        try {
+            await UserGame.update(userGame.id, { 
+                is_top_ten: false, 
+                priority_rank: null 
+            });
+            
+            // Rerank remaining games
+            const remainingTopTen = topTenList.filter(item => item.id !== userGame.id);
+            for (let i = 0; i < remainingTopTen.length; i++) {
+                await UserGame.update(remainingTopTen[i].id, { priority_rank: i + 1 });
+            }
+            
+            toast.success(`Removed from Top Ten Matching System™!`, {
+                description: `${games.find(g => g.id === userGame.game_id)?.title} moved back to your library`
+            });
+            onUpdate();
+        } catch (error) {
+            console.error("Error removing from Top Ten:", error);
+            toast.error("Failed to remove game from Top Ten Matching System™.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const moveUp = async (userGame) => {
+        const currentIndex = topTenList.findIndex(item => item.id === userGame.id);
+        if (currentIndex <= 0) return;
+
+        setIsLoading(true);
+        try {
+            const aboveGame = topTenList[currentIndex - 1];
+            
+            await UserGame.update(userGame.id, { priority_rank: currentIndex });
+            await UserGame.update(aboveGame.id, { priority_rank: currentIndex + 1 });
+            
+            onUpdate();
+        } catch (error) {
+            console.error("Error moving game up:", error);
+            toast.error("Failed to reorder games.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const moveDown = async (userGame) => {
+        const currentIndex = topTenList.findIndex(item => item.id === userGame.id);
+        if (currentIndex >= topTenList.length - 1) return;
+
+        setIsLoading(true);
+        try {
+            const belowGame = topTenList[currentIndex + 1];
+            
+            await UserGame.update(userGame.id, { priority_rank: currentIndex + 2 });
+            await UserGame.update(belowGame.id, { priority_rank: currentIndex + 1 });
+            
+            onUpdate();
+        } catch (error) {
+            console.error("Error moving game down:", error);
+            toast.error("Failed to reorder games.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const filteredLibrary = profileLibrary.filter(userGame => {
+        const game = games.find(g => g.id === userGame.game_id);
+        return game?.title.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <Card className="bg-slate-900/90 backdrop-blur-xl border-[#00FF41]/50 w-full max-w-6xl max-h-[90vh] overflow-hidden">
+                <CardHeader className="border-b border-[#00FF41]/30">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="text-[#00FF41] text-2xl flex items-center gap-3">
+                                <Trophy className="w-7 h-7" />
+                                Manage Your Top Ten Matching System™
+                            </CardTitle>
+                            <p className="text-purple-200 mt-1">
+                                Your <strong className="text-red-400 glow-red-text">Patent Pending</strong> Top Ten Matching System™ ({topTenList.length}/10) is your matching DNA. Choose your current gaming obsessions!
+                            </p>
+                        </div>
+                        <Button
+ 

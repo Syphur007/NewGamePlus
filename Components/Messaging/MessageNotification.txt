@@ -1,0 +1,43 @@
+import React, { useState, useEffect } from 'react';
+import { Message, User } from "@/entities/all";
+import { Badge } from "@/components/ui/badge";
+import { MessageCircle } from 'lucide-react';
+
+export default function MessageNotification() {
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      try {
+        const user = await User.me();
+        setCurrentUser(user);
+
+        const unreadMessages = await Message.filter({
+          receiver_id: user.id,
+          is_read: false
+        });
+
+        setUnreadCount(unreadMessages.length);
+      } catch (error) {
+        console.error("Error loading unread count:", error);
+      }
+    };
+
+    loadUnreadCount();
+    
+    // Refresh every 30 seconds
+    const interval = setInterval(loadUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (unreadCount === 0) return null;
+
+  return (
+    <div className="relative">
+      <Badge className="bg-red-600 text-white text-xs absolute -top-2 -right-2 min-w-[1.2rem] h-5 flex items-center justify-center rounded-full">
+        {unreadCount > 99 ? '99+' : unreadCount}
+      </Badge>
+    </div>
+  );
+}

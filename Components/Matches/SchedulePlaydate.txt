@@ -1,0 +1,46 @@
+
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { X, CalendarClock } from "lucide-react";
+import { PlayDate } from "@/entities/all";
+
+const SESSION_LENGTHS = [
+  { value: 60, label: "1 Hour" },
+  { value: 90, label: "1.5 Hours" },
+  { value: 120, label: "2 Hours" },
+  { value: 180, label: "3 Hours" },
+];
+
+export default function SchedulePlayDateDialog({ match, currentUser, matchedUser, sharedGames, onCancel, onScheduled }) {
+  const [formData, setFormData] = useState({
+    game_id: sharedGames.length > 0 ? sharedGames[0].id : "",
+    session_datetime: "",
+    session_length_minutes: 60,
+    is_public: false,
+  });
+  const [isScheduling, setIsScheduling] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (new Date(formData.session_datetime) < new Date()) {
+        setError("Cannot schedule a play date in the past.");
+        return;
+    }
+
+    setIsScheduling(true);
+    try {
+      await PlayDate.create({
+        ...formData,
+        match_id: match.id,
+        proposer_id: currentUser.id,
+        receiver_id: matchedUser.id,
+        session_length_minutes: Number(formData.session_length_minutes),
+ 

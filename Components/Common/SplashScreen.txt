@@ -1,0 +1,43 @@
+import React, { useState, useEffect } from 'react';
+
+export default function SplashScreen({ onComplete }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const [showPlus, setShowPlus] = useState(false);
+
+  useEffect(() => {
+    // Start the fade-in effect for main text
+    const fadeInTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, 200);
+
+    // Show plus sign 1 second later
+    const plusTimer = setTimeout(() => {
+      setShowPlus(true);
+    }, 1200);
+
+    // Call the onComplete handler to transition to the main app
+    const completeTimer = setTimeout(() => {
+      onComplete();
+    }, 3000);
+
+    return () => {
+      clearTimeout(fadeInTimer);
+      clearTimeout(plusTimer);
+      clearTimeout(completeTimer);
+    };
+  }, [onComplete]);
+
+  return (
+    <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center z-[100] p-4">
+      {/* Font Import - Same as Layout */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        .matrix-font {
+          font-family: 'Orbitron', monospace;
+        }
+      `}</style>
+      
+      {/* Main Logo */}
+      <div className="relative mb-2">
+        <h1 className="matrix-font font-black text-6xl md:text-8xl tracking-wider flex items-center justify-center">
+ 

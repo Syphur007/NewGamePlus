@@ -1,0 +1,34 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Wifi, RefreshCw, Gamepad2 } from "lucide-react";
+
+export default function OfflinePage() {
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 flex items-center justify-center p-6">
+      <Card className="bg-slate-900/50 backdrop-blur-xl border-purple-800/30 max-w-md text-center">
+        <CardHeader>
+          <div className="w-20 h-20 bg-slate-800/50 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <Wifi className="w-10 h-10 text-gray-500" />
+          </div>
+          <CardTitle className="text-white text-2xl mb-2">You're Offline</CardTitle>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          <div className="text-gray-300">
+            <p className="mb-4">
+              Looks like you've lost your connection to the gaming universe! 
+            </p>
+            <p className="text-sm text-gray-400">
+              Don't worry - your New Game Plus data is safe. Once you're back online, 
+              you can continue finding your Player 2 and managing your gaming connections.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-slate-800/50 rounded-lg p-4">
+ 

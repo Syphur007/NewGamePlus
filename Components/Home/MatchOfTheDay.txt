@@ -1,0 +1,105 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Star, MapPin, Gamepad2, Users, Trophy } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+
+export default function MatchOfTheDay({ match }) {
+  if (!match) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6, delay: 0.4 }}
+    >
+      <Card className="neon-border-purple card-neon-purple backdrop-blur-xl overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-purple-500/20 to-transparent rounded-br-3xl" />
+        
+        <CardHeader className="pb-3">
+          <CardTitle className="neon-text-purple text-lg flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-600/20 border border-purple-500">
+              <Star className="w-5 h-5 text-purple-400" />
+            </div>
+            Match of the Day
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <div className="flex items-start gap-4">
+            <Avatar className="w-16 h-16 border-4 border-purple-500/50 shadow-lg">
+              <AvatarImage src={match.avatar_url} />
+              <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xl font-bold">
+                {match.display_name?.[0] || match.full_name?.[0] || "G"}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div className="flex-1">
+              <h3 className="font-bold text-white text-xl matrix-font neon-text-orange mb-1">
+                {match.display_name || match.full_name}
+              </h3>
+              
+              <div className="flex items-center gap-2 text-gray-400 text-sm mb-2">
+                <MapPin className="w-4 h-4" />
+                <span>{match.location || "Unknown"}</span>
+                <span>•</span>
+                <span>{match.age}</span>
+              </div>
+              
+              <div className="flex flex-wrap gap-1 mb-3">
+                <Badge variant="outline" className="bg-purple-600/20 text-purple-200 border-purple-500 text-xs">
+                  {match.gaming_setup?.replace('_', ' ').toUpperCase()}
+                </Badge>
+                <Badge variant="outline" className="bg-[#00FF41]/20 text-[#00FF41] border-[#00FF41]/80 text-xs">
+                  {match.playstyle?.toUpperCase()}
+                </Badge>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-800/50 rounded-lg p-3 border border-purple-500/30">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-purple-300 font-medium text-sm">Compatibility Score</span>
+              <span className="text-[#00FF41] font-bold text-lg">
+                {match.compatibility_score}%
+              </span>
+            </div>
+            
+            {match.shared_top_ten_games && match.shared_top_ten_games.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-bold text-[#00FF41]">
+                  🎯 {match.shared_top_ten_games.length} Shared Top Ten Games:
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {match.shared_top_ten_games.slice(0, 3).map(game => (
+                    <Badge key={game.id} variant="secondary" className="text-xs bg-slate-700 text-gray-300">
+                      {game.title}
+                    </Badge>
+                  ))}
+                  {match.shared_top_ten_games.length > 3 && (
+                    <Badge variant="secondary" className="text-xs bg-slate-700 text-gray-300">
+                      +{match.shared_top_ten_games.length - 3} more
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex gap-2 pt-2">
+            <Link to={createPageUrl(`Profile?id=${match.id}`)} className="flex-1">
+              <Button className="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 font-bold">
+                <Users className="w-4 h-4 mr-2" />
+                View Profile
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}

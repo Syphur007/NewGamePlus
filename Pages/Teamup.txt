@@ -1,0 +1,39 @@
+import { GameTeam, TeamMember, Game, User, UserGame, StatusUpdate } from "@/entities/all";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Users, Plus, Search, Crown, Shield, Globe, Lock, Trophy, Clock } from "lucide-react";
+import { toast, Toaster } from "sonner";
+
+import CreateTeamDialog from "../components/teamup/CreateTeamDialog";
+import TeamCard from "../components/teamup/TeamCard";
+import TeamDetailsDialog from "../components/teamup/TeamDetailsDialog";
+
+export default function TeamUpPage() {
+    const [teams, setTeams] = useState([]);
+    const [myTeams, setMyTeams] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [games, setGames] = useState({});
+    const [users, setUsers] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterGame, setFilterGame] = useState("all");
+    const [filterType, setFilterType] = useState("all");
+    const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState(null);
+    const [showTeamDetails, setShowTeamDetails] = useState(false);
+
+    const loadTeamData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const me = await User.me();
+            setCurrentUser(me);
+
+            const [allTeams, allUsers, allGames, teamMembers] = await Promise.all([
+                GameTeam.list("-created_date"),
+                User.list(),
+                Game.list(),
+                TeamMember.list()
+            ]);
+

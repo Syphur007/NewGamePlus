@@ -1,0 +1,43 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertTriangle, Flag, Shield, Send } from 'lucide-react';
+import { toast } from "sonner";
+
+export default function ContentModerationSystem({ targetType, targetId, targetUser, onReport }) {
+  const [reportReason, setReportReason] = useState('');
+  const [reportDetails, setReportDetails] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showReportForm, setShowReportForm] = useState(false);
+
+  const reportReasons = [
+    { value: 'harassment', label: 'Harassment or Bullying' },
+    { value: 'inappropriate_content', label: 'Inappropriate Content' },
+    { value: 'spam', label: 'Spam or Fake Profile' },
+    { value: 'impersonation', label: 'Impersonation' },
+    { value: 'doxxing', label: 'Sharing Personal Information' },
+    { value: 'threats', label: 'Threats or Violence' },
+    { value: 'other', label: 'Other Violation' }
+  ];
+
+  const handleSubmitReport = async (e) => {
+    e.preventDefault();
+    
+    if (!reportReason) {
+      toast.error("Please select a reason for reporting.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      // In a real app, this would send to your moderation system
+      const reportData = {
+        target_type: targetType, // 'user', 'message', 'profile', etc.
+        target_id: targetId,
+        target_user_id: targetUser?.id,
+        reason: reportReason,
+        details: reportDetails,
+ 

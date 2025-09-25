@@ -1,0 +1,105 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Trophy, Target, Users, Search, Gamepad2, MessageSquare, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const MISSION_TYPES = {
+  scout: {
+    icon: Search,
+    title: "Scout Mission",
+    color: "text-blue-400",
+    bgColor: "bg-blue-600/20",
+    borderColor: "border-blue-500"
+  },
+  social: {
+    icon: MessageSquare,
+    title: "Social Quest",
+    color: "text-purple-400", 
+    bgColor: "bg-purple-600/20",
+    borderColor: "border-purple-500"
+  },
+  match: {
+    icon: Users,
+    title: "Match Hunter",
+    color: "text-[#00FF41]",
+    bgColor: "bg-[#00FF41]/20",
+    borderColor: "border-[#00FF41]"
+  },
+  curator: {
+    icon: Gamepad2,
+    title: "Game Curator",
+    color: "text-orange-400",
+    bgColor: "bg-orange-600/20",
+    borderColor: "border-orange-500"
+  },
+  planner: {
+    icon: Calendar,
+    title: "Session Planner",
+    color: "text-pink-400",
+    bgColor: "bg-pink-600/20",
+    borderColor: "border-pink-500"
+  }
+};
+
+export default function DailyMissionCard({ mission }) {
+  const missionType = MISSION_TYPES[mission.type] || MISSION_TYPES.scout;
+  const IconComponent = missionType.icon;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+    >
+      <Card className={`neon-border-green card-neon-green backdrop-blur-xl overflow-hidden relative`}>
+        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#00FF41]/20 to-transparent rounded-bl-3xl" />
+        
+        <CardHeader className="pb-3">
+          <CardTitle className="neon-text-green text-lg flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${missionType.bgColor} border ${missionType.borderColor}`}>
+              <IconComponent className={`w-5 h-5 ${missionType.color}`} />
+            </div>
+            Daily Mission: {missionType.title}
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="font-bold text-white text-xl matrix-font mb-2">
+              {mission.title}
+            </h3>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              {mission.description}
+            </p>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-400" />
+              <span className="text-yellow-300 font-semibold text-sm">
+                {mission.xp_reward} XP
+              </span>
+            </div>
+            
+            <Badge className={`${missionType.bgColor} ${missionType.color} border ${missionType.borderColor} font-bold`}>
+              {mission.difficulty.toUpperCase()}
+            </Badge>
+          </div>
+          
+          <div className="bg-slate-800/50 rounded-lg p-3 border border-[#00FF41]/30">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-[#00FF41] font-medium">Progress:</span>
+              <span className="text-white font-bold">
+                {mission.current_progress || 0} / {mission.target_progress}
+              </span>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-2 mt-2">
+              <div 
+                className="bg-gradient-to-r from-[#00FF41] to-green-400 h-2 rounded-full transition-all duration-500"
+                style={{ 
+                  width: `${Math.min(((mission.current_progress || 0) / mission.target_progress) * 100, 100)}%` 
+                }}
+              />
+            </div>
+ 

@@ -1,0 +1,43 @@
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Gamepad2, Swords } from "lucide-react";
+
+export default function GameWheel({ games, onSelect, onClose, isARMode = false }) {
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [rotation, setRotation] = useState(0);
+
+    const spinWheel = () => {
+        if (!games || games.length === 0 || isSpinning) return;
+
+        setIsSpinning(true);
+        const spins = 5 + Math.random() * 3;
+        const finalRotation = rotation + (spins * 360);
+        setRotation(finalRotation);
+
+        setTimeout(() => {
+            const selectedIndex = Math.floor(Math.random() * games.length);
+            const selectedGame = games[selectedIndex];
+            setIsSpinning(false);
+            if (selectedGame && onSelect) {
+                onSelect(selectedGame);
+            }
+        }, 4000);
+    };
+
+    if (!games || games.length === 0) {
+        return (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                <div className="bg-slate-900/90 backdrop-blur-xl border border-purple-500/50 rounded-xl p-8 text-center max-w-md">
+                    <Gamepad2 className="w-16 h-16 text-purple-500 mx-auto mb-4" />
+                    <h3 className="text-xl text-white font-bold mb-2">No Games Available</h3>
+                    <p className="text-purple-200 mb-4">
+                        {isARMode ? "No AR games available for challenges." : "No games available for challenges."}
+                    </p>
+                    <Button 
+                        onClick={onClose}
+                        className="bg-purple-600 hover:bg-purple-700"
+                    >
+                        Close
+                    </Button>
+                </div>
+ 

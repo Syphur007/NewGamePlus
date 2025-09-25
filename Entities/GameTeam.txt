@@ -1,0 +1,68 @@
+  "name": "GameTeam",
+  "type": "object",
+  "properties": {
+    "team_name": {
+      "type": "string",
+      "description": "Name of the team"
+    },
+    "game_id": {
+      "type": "string",
+      "description": "Game this team is for"
+    },
+    "creator_id": {
+      "type": "string",
+      "description": "User who created the team"
+    },
+    "description": {
+      "type": "string",
+      "description": "Team description and requirements"
+    },
+    "max_members": {
+      "type": "number",
+      "default": 5,
+      "description": "Maximum number of team members"
+    },
+    "is_private": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether team requires invitation to join"
+    },
+    "team_type": {
+      "type": "string",
+      "enum": [
+        "casual",
+        "competitive",
+        "ranked",
+        "tournament",
+        "clan"
+      ],
+      "default": "casual",
+      "description": "Type of team and play style"
+    },
+    "required_skill_level": {
+      "type": "string",
+      "enum": [
+        "any",
+        "beginner",
+        "intermediate",
+        "advanced",
+        "expert"
+      ],
+      "default": "any",
+      "description": "Minimum skill level required"
+    },
+    "team_schedule": {
+      "type": "string",
+      "description": "When the team typically plays (e.g., 'Weekends', 'Evenings EST')"
+    },
+    "team_goals": {
+      "type": "string",
+      "description": "What the team wants to accomplish"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "recruiting",
+        "full",
+        "inactive",
+ 

@@ -1,0 +1,45 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { X, Plus, Gamepad2 } from "lucide-react";
+import { Game } from "@/entities/all";
+import { toast } from "sonner";
+
+const GAME_GENRES = [
+  "Action", "Adventure", "RPG", "FPS", "Battle Royale", "MOBA", "Strategy", "Racing",
+  "Sports", "Simulation", "Puzzle", "Fighting", "Platformer", "Horror", "MMO", "Other"
+];
+
+const GAMING_PLATFORMS = [
+  "PC", "PlayStation 5", "PlayStation 4", "Xbox Series X/S", "Xbox One", 
+  "Nintendo Switch", "Mobile", "VR", "Steam Deck", "Web Browser"
+];
+
+export default function CreateGameDialog({ onClose, onGameCreated }) {
+  const [formData, setFormData] = useState({
+    title: "",
+    genre: "",
+    platform: [],
+    description: "",
+    is_multiplayer: true
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.title.trim()) {
+      toast.error("Game title is required!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const newGame = await Game.create({
+        ...formData,
+        title: formData.title.trim(),
+        // Always leave image_url empty for copyright protection

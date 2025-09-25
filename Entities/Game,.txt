@@ -1,0 +1,40 @@
+  "name": "Game",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Official game title"
+    },
+    "genre": {
+      "type": "string",
+      "description": "Primary game genre (FPS, MOBA, RPG, etc.)"
+    },
+    "platform": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "PC",
+          "PlayStation 5",
+          "PlayStation 4",
+          "Xbox Series X/S",
+          "Xbox One",
+          "Nintendo Switch",
+          "Nintendo 3DS",
+          "Steam Deck",
+          "iOS",
+          "Android",
+          "Meta VR",
+          "PlayStation VR",
+          "HTC Vive",
+          "Oculus Rift",
+          "AR",
+          "Retro Console",
+          "Arcade",
+          "Cross-Platform"
+        ]
+      },
+      "description": "Available gaming platforms"
+    },
+    "image_url": {
+ 
